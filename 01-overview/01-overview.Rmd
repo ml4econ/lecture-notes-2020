@@ -2,7 +2,7 @@
 title: "Course Overview"
 subtitle: ""
 author: "Itamar Caspi"
-date: "March 10, 2019 (updated: `r Sys.Date()`)"
+date: "March 15, 2020 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -22,20 +22,21 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-library(knitr)
-knitr::opts_chunk$set(eval = TRUE, echo = TRUE, warning = FALSE,
-                      message = FALSE, cache = FALSE)
+
+knitr::opts_chunk$set(eval = TRUE,
+               echo = TRUE,
+               warning = FALSE,
+               message = FALSE,
+               cache = FALSE)
 
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 ```
 
 ```{r plots_and_figures, include=FALSE}
-
 library(ggplot2)
-theme_set(theme_gray(15))
-
 library(kableExtra)
 
+theme_set(theme_gray(15))
 ```
 
 ```{r, references, echo=FALSE, cache=FALSE}
@@ -56,8 +57,8 @@ class: .title-slide-final, center, inverse, middle
 # 10-Year challenge
 
 .big[
-__2009: ML = Maximum Likelihood__  
-__2019: ML = Machine Learning__
+__2010: ML = Maximum Likelihood__  
+__2020: ML = Machine Learning__
 ]
 
 
@@ -140,9 +141,9 @@ You can access our GitHub discussion repository [here](https://github.com/ml4eco
 - __Itamar Caspi__  
   - Head of Monetary Analysis Unit, Research Department, Bank of Israel.
   - email: [caspi.itamar@gmail.com](mailto:caspi.itamat@gmail.com) 
-  - homepage and blog: [https://itamarcaspi.rbind.io/](https://itamarcaspi.rbind.io/)
+  - homepage: [https://itamarcaspi.rbind.io/](https://itamarcaspi.rbind.io/)
   
-- __Ariel Mansura__  
+- __Dor Goldenberg__  
   - Head of Statistical Methodology Unit, Information and Statistics Department, Bank of Israel.
   - email: [ariel.mansura@boi.org.il](mailto:ariel.mansura@boi.org.il)
 

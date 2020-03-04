@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 
 # Course Overview
 ### Itamar Caspi
-### March 10, 2019 (updated: 2019-03-18)
+### March 10, 2019 (updated: 2020-03-04)
 
 ---
 
@@ -34,8 +34,8 @@ class: .title-slide-final, center, inverse, middle
 # 10-Year challenge
 
 .big[
-__2009: ML = Maximum Likelihood__  
-__2019: ML = Machine Learning__
+__2010: ML = Maximum Likelihood__  
+__2020: ML = Machine Learning__
 ]
 
 
@@ -106,9 +106,9 @@ You can access our GitHub discussion repository [here](https://github.com/ml4eco
 - __Itamar Caspi__  
   - Head of Monetary Analysis Unit, Research Department, Bank of Israel.
   - email: [caspi.itamar@gmail.com](mailto:caspi.itamat@gmail.com) 
-  - homepage and blog: [https://itamarcaspi.rbind.io/](https://itamarcaspi.rbind.io/)
+  - homepage: [https://itamarcaspi.rbind.io/](https://itamarcaspi.rbind.io/)
   
-- __Ariel Mansura__  
+- __Dor Goldenberg__  
   - Head of Statistical Methodology Unit, Information and Statistics Department, Bank of Israel.
   - email: [ariel.mansura@boi.org.il](mailto:ariel.mansura@boi.org.il)
 
@@ -222,7 +222,7 @@ There are __no__ required textbooks.
 A couple of suggestions:
 
 - [An Introduction to Statistical Learning with Applications in R (ISLR)](http://www-bcf.usc.edu/~gareth/ISL)  
-James, Hastie, Witten, and Tibshirani (2013)  
+James, Hastie, Witten, et al. (2013)  
 __PDF available online__ 
 
 - [The Elements of Statistical Learning (ELS)](http://statweb.stanford.edu/~tibs/ElemStatLearn)  
@@ -391,14 +391,13 @@ class: .title-slide-final, center, inverse, middle
 ---
 # References
 
-&lt;a name=bib-athey2018the&gt;&lt;/a&gt;[[1]](#cite-athey2018the) S. Athey.
-"The impact of machine learning on economics". In: _The Economics
-of Artificial Intelligence: An Agenda_. University of Chicago
-Press, 2018.
+[1] S. Athey. "The impact of machine learning on economics". In:
+_The Economics of Artificial Intelligence: An Agenda_. University
+of Chicago Press, 2018.
 
-[2] T. Hastie, R. Tibshirani and J. Friedman. _The Elements of
+[2] T. Hastie, R. Tibshirani, and J. Friedman. _The Elements of
 Statistical Learning: Data Mining, Inference, and Prediction,
-Second Edition_. Springer, Feb. 2009. ISBN: 9780387848570.
+Second Edition_. Springer, פבר. 2009. ISBN: 9780387848570.
 
 [3] G. James, T. Hastie, D. Witten, et al. _An Introduction to
 Statistical Learning: With Applications in R_. Springer Texts in
@@ -455,7 +454,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {
