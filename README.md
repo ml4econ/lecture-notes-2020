@@ -47,7 +47,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 |:----------------------|:-------------------------------------------|
 | [**1**](#week-1)      | Course Overview & Basic ML Concepts        |
 | [**2**](#week-2)      | Reproducibiliy and Version Control         |
-| [**3**](#week-3)      | Regression                                 |
+| [**3**](#week-3)      | Regression and Regularization              |
 | [**4**](#week-4)      | Classification                             |
 | [**5**](#week-5)      | Non-parametrics                            |
 | [**6**](#week-6)      | Unsupervised Learning                      | 
