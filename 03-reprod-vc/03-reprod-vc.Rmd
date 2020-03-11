@@ -1,8 +1,8 @@
 ---
 title: "Reproducible Projects and Version Control"
-subtitle: ""
+subtitle: "ml4econ, HUJI 2020"
 author: "Itamar Caspi"
-date: "March 18, 2019 (updated: `r Sys.Date()`)"
+date: "March 15, 2020 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -20,17 +20,15 @@ output:
       
 ---
 
-# Replicating this presentation
+# Replicating this Presentation
 
 R packages used to produce this presentation
 
 ```{r load packages, message=FALSE}
-
+library(tidyverse) # for data wrangling and plotting
+library(tidymodels) # for modeling the tidy way
 library(knitr) # for presenting tables
 library(xaringan) # for rendering xaringan presentations
-library(tidyverse) # for data wrangling and plotting
-library(tidymodels) # for modelling the tidy way
-
 ```
 
 If you are missing a package, run the following command
@@ -43,27 +41,26 @@ install.packages("package_name")
 Alternatively, you can just use the [pacman](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package that loads and installs packages:
 
 ```{r pacman, message=FALSE, warning=FALSE, eval=FALSE}
-
 if (!require("pacman")) install.packages("pacman")
 
 pacman::p_load(tidyvers, tidymodels, knitr, xaringan)
-
-
 ```
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-library(knitr)
-knitr::opts_chunk$set(eval = TRUE, echo = TRUE, warning = FALSE,
-                      message = FALSE, cache = FALSE)
+
+knitr::opts_chunk$set(
+  eval = TRUE,
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
 
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 ```
 
 ```{r plots_and_figures, include=FALSE}
-
-ggplot2::theme_set(theme_gray(15))
-
+theme_set(theme_gray(15))
 ```
 
 ```{r, references, echo=FALSE, cache=FALSE}
@@ -78,7 +75,20 @@ bib <- ReadBib("refs/refs.bib", check = FALSE)
 ```
 
 
+---
 
+# From Best Practices to Methodology
+
+|  Best Practice                 | Methodology                           |
+|:-------------------------------|:--------------------------------------|
+| High dimensional statistics    | Machine learning                      |
+|  `# code annotation`           | Notebooks (R Markdown, Jupyter)       |
+|  `mydoc_1_3_new_final_23.docx` | Version control                       |
+|  `W:\`                         | Git branches                          |
+| Ask tables (xlsx)              | Generate tables (SQL, dplyr, pandas)  |
+|  ??                            | Reproducibility                       |
+| Stata, SAS, EViews             | R, Python, Julia                      |
+| Solo                           | Interdisciplinary teams               |
 
 ---
 
@@ -119,13 +129,11 @@ name: projects
 
 ---
 
-# An aside: Docker
+# An Aside: Docker
 
 .pull-left[
 ```{r, echo=FALSE, out.width = "100%", fig.align='center'}
-
 knitr::include_graphics("https://www.docker.com/sites/default/files/social/docker_facebook_share.png")
-
 ```
 ]
 
@@ -144,7 +152,7 @@ knitr::include_graphics("https://www.docker.com/sites/default/files/social/docke
 
 ---
 
-# RStudio project environment
+# RStudio Project Environment
 
 
 - If your R script starts with `setwd()` or `rm(list=ls())` then are [doing something wrong](https://www.tidyverse.org/articles/2017/12/workflow-vs-script/)!  
@@ -187,6 +195,16 @@ name: tidyverse
 
 
 ---
+# This is Not a Pipe
+
+```{r pipe, echo=FALSE, out.width = "50%", fig.align='center'}
+
+knitr::include_graphics("figs/pipe.jpg")
+
+```
+
+
+---
 
 # Prerequisite: `%>%` is a pipe
 
@@ -206,66 +224,80 @@ The second line of code should be read as: "take `x`, _then_ put it through `f()
 
 ---
 
-# Base R vs. the tidyverse
+# Base R vs. the Tidyverse
 
 - Consider the following data frame:
-```{r remedy001}
-
+```{r }
 df <- data.frame(x = rnorm(10),
                  y = rnorm(10),
                  z = rnorm(10))
-
 ```
 
-- Can you guess what this code chunk does?
-```{r remedy002}
-
-df_new <- df[, c("x", "y")]["x" > 0]
+- Can you guess what the following code chunk does?
+```{r }
+df_new <- df[df$x > 0, c("x", "y")]
 df_new$xx <- df_new$x^2
-
 ```
 
 --
 
-- How about this?
+- How about this one?
 
-```{r remedy003}
-
+```{r }
 df_new <- df %>% 
   select(x, y) %>% 
   filter(x > 0) %>% 
   mutate(xx = x^2)
-  
-
 ```
-
-
-???
-
-the "tidyvers" code chunk should be read as "generate a new dataframe `df_new` by taking `df`, _then_ select `x` and `y`, _then_ filter rows where `x` is positive, _then_ mutate a new variable `xx = x^2`
 
 ---
 
-# The Tidyverse
+# How to read "piped" code?
 
-- Following a "tidy" approach makes your code more readable, and thus reproducible.
+```{r }
+df_new <- df %>% 
+  select(x, y) %>% 
+  filter(x > 0) %>% 
+  mutate(xx = x^2)
+```
+
+
+The above code chunk should be read as:
+
+>"generate a new dataframe `df_new` by taking `df`, _then_ select `x` and `y`, _then_ filter rows where `x` is positive, _then_ mutate a new variable `xx = x^2`"
+
+
+---
+
+# Pros & cons
+
+- Following a "tidy" approach makes your code more readable $\Rightarrow$ more reproducible.
 
 - I believe that there is a growing consensus in the #rstats community that we should [learn the tidyverse first](http://varianceexplained.org/r/teach-tidyverse/).
 
 - Nevertheless, note that the tidyverse is "Utopian" in the sense that it strives toward _perfection_, and thus keeps changing. By contrast, base R was built to last.
 
-- As usual, begin proficient in both (base R and the tidyverse) will get you far...
+- As usual, being proficient in both (base R and the tidyverse) will get you far...
 
 
 ---
+# The Tidyverse
 
-# Tidyverse packages
+```{r tidyverse_pic, echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/tidyverse.png")
+
+```
+
+---
+
+# Tidyverse Packages
 
 Which packages come with `tidyverse`?
 
-```{r remedy004}
+```{r }
 
-tidyverse::tidyverse_packages()
+tidyverse_packages()
 
 ```
 
@@ -298,7 +330,7 @@ We now briefly introduce one the tidyvers flagships: `dplyr`.
 
 ---
 
-# Tidymodels
+# The `tidymodels` package
 
 - Tidymodels extends the tidyverse "grammar" philosophy to modelling tasks.
 
@@ -333,7 +365,7 @@ name: git
 
 ---
 
-# Version control
+# Version Control
 
 .pull-left[
 ```{r, echo=FALSE, out.width = "90%", fig.align='center'}
@@ -429,28 +461,19 @@ The source for the definition of GitHub is [Wikipedia](https://en.wikipedia.org/
 class: title-slide-section-blue, center, middle
 name: practice
 
-# Let's practice!
+# Let's Practice!
 -----------------
 
 
 ---
-# Your mission
 
-1. Open your first R project and publish it on GitHub.  
-
-2. Clone this course's lecture notes GitHub repository.
-
-
-
----
-
-# Suggested workflow for starting a new R project
+# Suggested workflow for starting a new (desktop) R project
 
 RStudio:
 
 1. Open RStudio.
 2. File -> New Project -> New Directory -> New Project.
-3. Name your project under "Directory name:". Make sure to check "Create git repository".<sup>1</sup>
+3. Name your project under "Directory name:". Make sure to check "Create git repository".
 
 GitHub Desktop:
 
@@ -459,14 +482,36 @@ GitHub Desktop:
 3. Set "Local path" to your RStudio project's folder.
 4. Publish local git repo on GitHub (choose private or public repo).
 
+---
 
-.footnote[
-<sup>1</sup> RStudio automatically generates a `.gitignore` file that tells git which files to ignore (duh!). Click [here](https://raw.githack.com/uo-ec607/lectures/master/02-git/02-Git.html#57) for further details on how to configure what to ignore. 
-]
+# Suggested workflow for starting a new RStudio Cloud project
+
+
+1. Login to RStudio Cloud.
+2. Choose workspace (e.g., ml4econ-2020).
+3. Click on "New Project" (optional - from GitHub).
+4. Set up Git: Tools -> Version Control -> Project Setup -> set "Version Control System" to "Git" and restart session.
+5. Introduce yourself to Git
+
+```r
+install.packages("usethis")
+
+library(usethis)
+
+use_git_config(
+  scope = "project",
+  user.name = "Jane",
+  user.email = "jane@example.org"
+)
+```
+(6. Some extra steps are needed in order to publish and sync this new project with GitHub.)
+
+
+
 
 ---
 
-# Git workflow
+# Suggested Git Workflow
 
 The __pull -> stage -> commit -> push__ workflow:
 
@@ -483,7 +528,7 @@ The __pull -> stage -> commit -> push__ workflow:
 
 
 ---
-# Clone and sync a remote GitHub repository
+# Clone and Sync a Remote GitHub Repository
 
 Cloning:
 
@@ -500,6 +545,24 @@ Syncing:
 4. __Pull__ any changes made on the remote repo.
 
 
+---
+# Your Mission
+
+1. Login to RStudio Cloud.
+
+2. Create your first R project.
+
+3. Initiate Git.<sup>1</sup>
+
+4. Create a new RMarkdown file.
+
+5. Commit.
+
+
+.footnote[
+<sup>1</sup> RStudio automatically generates a `.gitignore` file that tells git which files to ignore (duh!). Click [here](https://raw.githack.com/uo-ec607/lectures/master/02-git/02-Git.html#57) for further details on how to configure what to ignore. 
+]
+
 
 
 ---
@@ -507,6 +570,7 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %>% end()`
 
-[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/03-reprod-vc)  
+
+[<i class="fa fa-github"></i> Source code](https://github.com/itamarcaspi/boi-data-science-2019/blob/master/02-reprod-vc/02-reprod-vc.Rmd)  
 
 

@@ -1,6 +1,6 @@
 ---
 title: "Course Overview"
-subtitle: ""
+subtitle: "ml4econ, HUJI 2020"
 author: "Itamar Caspi"
 date: "March 15, 2020 (updated: `r Sys.Date()`)"
 output:
@@ -103,35 +103,19 @@ name: logistics
 
 
 ---
-# Class website
+# Class GitHub repository
 
-The (unofficial) class website: [https://ml4econ.github.io/course-spring2019](https://ml4econ.github.io/course-spring2019/index.html)
+The class's GitHub repository: [https://github.com/ml4econ](https://github.com/ml4econ)
 
 ```{r, echo=FALSE, out.width = "80%", fig.align='center'}
 
-knitr::include_graphics("figs/homepage.gif")
+knitr::include_graphics("figs/repo.gif")
 
 ```
 
 
----
-# Discussion forum
 
-We will use a [GitHub discussion repository](https://github.com/ml4econ/discussion-spring2019). To use it, you'll need to create a GitHub account and ask for an invitations from Itamar.  
 
-```{r, echo=FALSE, out.width = "80%", fig.align='center'}
-
-knitr::include_graphics("figs/discussions.gif")
-
-```
-
-???
-
-Google and [StackExchange](https://stackexchange.com/) are typically the first places to look for answers for computational related questions. It is safe to always assume that you are not the first one to encounter your problem.
-
-Nevertheless, we will also be using a private GitHub repository for class discussion. Please post there any questions or requests you may have that are relevant to all course participants, rather than emailing us. All of your classmates will benefit from the public discussions.
-
-You can access our GitHub discussion repository [here](https://github.com/ml4econ/discussion-spring2019), but before you do, make sure that you have created a GitHub account (see instruction [here](https://ml4econ.github.io/course-spring2019/git.html)) and that you have received a collaboration invitations from me (Itamar). Shoot me an email if you haven't received an invitation.
 
 ---
 
@@ -144,8 +128,8 @@ You can access our GitHub discussion repository [here](https://github.com/ml4eco
   - homepage: [https://itamarcaspi.rbind.io/](https://itamarcaspi.rbind.io/)
   
 - __Dor Goldenberg__  
-  - 
-  - email: [](mailto:)
+  - Asistant economist, Monetary Analysis Unit, Research Department, Bank of Israel; MA student, HUJI.
+  - email: [dorgoldenberg@gmail.com ](mailto:dorgoldenberg@gmail.com )
 
 
 * Meeting hours: after class, on demand.
@@ -159,7 +143,7 @@ You can access our GitHub discussion repository [here](https://github.com/ml4eco
 This is the second time we run this course $\Rightarrow$ your continuous feedback is important!
 
 
-Please contact us by
+Please feel free to contact us by
 
   - email  
 
@@ -224,13 +208,13 @@ To do that we will need to understand
 
 ---
 
-# Syllabus
+# Tentative schedule
 
 | Week                  | Topic                                      |
 |:----------------------|:-------------------------------------------|
 | [**1**](#week-1)      | Course Overview & Basic ML Concepts        |
 | [**2**](#week-2)      | Reproducibiliy and Version Control         |
-| [**3**](#week-3)      | Regression                                 |
+| [**3**](#week-3)      | Regression and Regularization              |
 | [**4**](#week-4)      | Classification                             |
 | [**5**](#week-5)      | Non-parametrics                            |
 | [**6**](#week-6)      | Unsupervised Learning                      | 
@@ -244,6 +228,35 @@ To do that we will need to understand
 
 
 > __NOTE__: This schedule can (and probably will) go through changes!
+
+
+---
+
+# Readings on ML for economists
+
+> All materials and lecture notes will be available on the [class website](https://ml4econ.github.io/course-spring2019/lectures.html).
+
+.pull-left[
+
+Please read the following excellent surveys:
+
+- [The impact of machine learning on economics](https://www.nber.org/chapters/c14009.pdf) `r Citet(bib, "athey2018the")`  
+In _The Economics of Artificial Intelligence: An Agenda_.  
+University of Chicago Press.   
+
+- [Machine learning: an applied econometric approach](https://www.aeaweb.org/articles?id=10.1257/jep.31.2.87) `r Citet(bib, "mullainathan2017machine")`  
+_Journal of Economic Perspectives_, 31(2), 87-106.  
+
+]
+
+.pull-right[
+
+```{r susan_sendhil, echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/susan_sendhil.png")
+
+```
+]
 
 ---
 
@@ -276,38 +289,17 @@ knitr::include_graphics("figs/books.png")
 ```
 
 ]
----
-
-# Readings on ML for economists
-
-> All materials and lecture notes will be available on the [class website](https://ml4econ.github.io/course-spring2019/lectures.html).
-
-.pull-left[
-
-Please read the following excellent surveys:
-
-- [The impact of machine learning on economics](https://www.nber.org/chapters/c14009.pdf) `r Citet(bib, "athey2018the")`  
-In _The Economics of Artificial Intelligence: An Agenda_.  
-University of Chicago Press.   
-
-- [Machine learning: an applied econometric approach](https://www.aeaweb.org/articles?id=10.1257/jep.31.2.87) `r Citet(bib, "mullainathan2017machine")`  
-_Journal of Economic Perspectives_, 31(2), 87-106.  
-
-]
-
-.pull-right[
-
-```{r susan_sendhil, echo=FALSE, out.width = "100%", fig.align='center'}
-
-knitr::include_graphics("figs/susan_sendhil.png")
-
-```
-]
 
 
 ---
 
-# Programming language
+# More resources
+
+
+
+---
+
+# Programming
 
 
 * Two of the most popular open-source programming languages for data science:  
@@ -316,20 +308,12 @@ knitr::include_graphics("figs/susan_sendhil.png")
   
   - [<i class="fab fa-python"></i> Python](https://www.python.org/)  
 
-* Our recommendation: R.  
+* This course: R.  
 
 * Why R? See presentation notes and the [FAQ section](https://ml4econ.github.io/course-spring2019/faq.html) of our class website.  
 
 *  We do encourage you to try out Python. However, we will only be able to provide limited support for Python users. 
 
-
-???
-
-__Why R (and not Python)?__
-
-First things first, there is nothing that [R can do that Pyhton can't](https://www.quora.com/What-can-R-do-that-Python-cant) and [vice verca](https://www.quora.com/What-can-Python-do-that-R-cant). From our perspective, the main difference between the two is their purpose - Python is a general purpose programming language, whereas R was designed by statisticians (and a like) for statisticians. This means that R comes with thousands of built-in and user contributed libraries that help with statistical and econometric analysis. Python can do all that, but in many cases that are important to us, you'll need to code R procedures in Python from scratch.  
-
-For instance, during this course we will make use of the [__causalTree__](https://github.com/susanathey/causalTree) and [__grf__](https://github.com/grf-labs/grf) R packages (created by Susan Athey et al.). These packages use trees and forests in order to estimate _heterogeneous_ treatment effects. __causalTree__ and __grf__ extend the popular __rpart__ R package, to deal with the task of of estimating causal effects. If you want to perform a causal tree analysis with Python, you'll have to program the whole thing by yourself. Though this could serve as a valuable exercise (and it even appears as an open [issue](https://github.com/grf-labs/grf/issues/257) in the __grf__ project repository), it is way beyond the scope of this course.
 
 
 ---
@@ -422,9 +406,9 @@ name: todo
 
 <!-- <i class="fas fa-check-square"></i> Download and install [GitHub Desktop](https://desktop.github.com/).   -->
 
-<i class="fas fa-check-square"></i> Create an account on [Rstudio Cloud](https://login.rstudio.cloud/register) and ask Itamar to invite you to our workspace.
+<i class="fas fa-check-square"></i> Create an account on [Rstudio Cloud](https://login.rstudio.cloud/register) and ask Dor/Itamar to invite you to our workspace.
 
-<i class="fas fa-check-square"></i> Create an account on [DataCamp](https://www.datacamp.com/home) and ask Itamar to invite you to [DataCamp Classroom](https://www.datacamp.com/enterprise/machine-learning-for-economists).
+<i class="fas fa-check-square"></i> Create an account on [DataCamp](https://www.datacamp.com/home) and ask Dor/Itamar to invite you to [DataCamp Classroom](https://www.datacamp.com/enterprise/machine-learning-for-economists).
 
 <!-- <i class="fas fa-check-square"></i> Create an account on [Kaggle](www.kaggle.com) and ask Itamar to invite you the course's [prediction competition](https://www.kaggle.com/t/97eb0edcbe7c406882c7c067076bedd3). -->
 

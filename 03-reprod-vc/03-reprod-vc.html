@@ -15,22 +15,23 @@
 class: center, middle, inverse, title-slide
 
 # Reproducible Projects and Version Control
+## ml4econ, HUJI 2020
 ### Itamar Caspi
-### March 18, 2019 (updated: 2019-03-18)
+### March 15, 2020 (updated: 2020-03-11)
 
 ---
 
 
-# Replicating this presentation
+# Replicating this Presentation
 
 R packages used to produce this presentation
 
 
 ```r
+library(tidyverse) # for data wrangling and plotting
+library(tidymodels) # for modeling the tidy way
 library(knitr) # for presenting tables
 library(xaringan) # for rendering xaringan presentations
-library(tidyverse) # for data wrangling and plotting
-library(tidymodels) # for modelling the tidy way
 ```
 
 If you are missing a package, run the following command
@@ -56,7 +57,20 @@ pacman::p_load(tidyvers, tidymodels, knitr, xaringan)
 
 
 
+---
 
+# From Best Practices to Methodology
+
+|  Best Practice                 | Methodology                           |
+|:-------------------------------|:--------------------------------------|
+| High dimensional statistics    | Machine learning                      |
+|  `# code annotation`           | Notebooks (R Markdown, Jupyter)       |
+|  `mydoc_1_3_new_final_23.docx` | Version control                       |
+|  `W:\`                         | Git branches                          |
+| Ask tables (xlsx)              | Generate tables (SQL, dplyr, pandas)  |
+|  ??                            | Reproducibility                       |
+| Stata, SAS, EViews             | R, Python, Julia                      |
+| Solo                           | Interdisciplinary teams               |
 
 ---
 
@@ -97,7 +111,7 @@ name: projects
 
 ---
 
-# An aside: Docker
+# An Aside: Docker
 
 .pull-left[
 &lt;img src="https://www.docker.com/sites/default/files/social/docker_facebook_share.png" width="100%" style="display: block; margin: auto;" /&gt;
@@ -118,7 +132,7 @@ name: projects
 
 ---
 
-# RStudio project environment
+# RStudio Project Environment
 
 
 - If your R script starts with `setwd()` or `rm(list=ls())` then are [doing something wrong](https://www.tidyverse.org/articles/2017/12/workflow-vs-script/)!  
@@ -161,6 +175,12 @@ name: tidyverse
 
 
 ---
+# This is Not a Pipe
+
+&lt;img src="figs/pipe.jpg" width="50%" style="display: block; margin: auto;" /&gt;
+
+
+---
 
 # Prerequisite: `%&gt;%` is a pipe
 
@@ -180,7 +200,7 @@ The second line of code should be read as: "take `x`, _then_ put it through `f()
 
 ---
 
-# Base R vs. the tidyverse
+# Base R vs. the Tidyverse
 
 - Consider the following data frame:
 
@@ -190,16 +210,28 @@ df &lt;- data.frame(x = rnorm(10),
                  z = rnorm(10))
 ```
 
-- Can you guess what this code chunk does?
+- Can you guess what the following code chunk does?
 
 ```r
-df_new &lt;- df[, c("x", "y")]["x" &gt; 0]
+df_new &lt;- df[df$x &gt; 0, c("x", "y")]
 df_new$xx &lt;- df_new$x^2
 ```
 
 --
 
-- How about this?
+- How about this one?
+
+
+```r
+df_new &lt;- df %&gt;% 
+  select(x, y) %&gt;% 
+  filter(x &gt; 0) %&gt;% 
+  mutate(xx = x^2)
+```
+
+---
+
+# How to read "piped" code?
 
 
 ```r
@@ -210,32 +242,38 @@ df_new &lt;- df %&gt;%
 ```
 
 
-???
+The above code chunk should be read as:
 
-the "tidyvers" code chunk should be read as "generate a new dataframe `df_new` by taking `df`, _then_ select `x` and `y`, _then_ filter rows where `x` is positive, _then_ mutate a new variable `xx = x^2`
+&gt;"generate a new dataframe `df_new` by taking `df`, _then_ select `x` and `y`, _then_ filter rows where `x` is positive, _then_ mutate a new variable `xx = x^2`"
+
 
 ---
 
-# The Tidyverse
+# Pros &amp; cons
 
-- Following a "tidy" approach makes your code more readable, and thus reproducible.
+- Following a "tidy" approach makes your code more readable `\(\Rightarrow\)` more reproducible.
 
 - I believe that there is a growing consensus in the #rstats community that we should [learn the tidyverse first](http://varianceexplained.org/r/teach-tidyverse/).
 
 - Nevertheless, note that the tidyverse is "Utopian" in the sense that it strives toward _perfection_, and thus keeps changing. By contrast, base R was built to last.
 
-- As usual, begin proficient in both (base R and the tidyverse) will get you far...
+- As usual, being proficient in both (base R and the tidyverse) will get you far...
 
 
 ---
+# The Tidyverse
 
-# Tidyverse packages
+&lt;img src="figs/tidyverse.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Tidyverse Packages
 
 Which packages come with `tidyverse`?
 
 
 ```r
-tidyverse::tidyverse_packages()
+tidyverse_packages()
 ```
 
 ```
@@ -276,7 +314,7 @@ We now briefly introduce one the tidyvers flagships: `dplyr`.
 
 ---
 
-# Tidymodels
+# The `tidymodels` package
 
 - Tidymodels extends the tidyverse "grammar" philosophy to modelling tasks.
 
@@ -319,7 +357,7 @@ name: git
 
 ---
 
-# Version control
+# Version Control
 
 .pull-left[
 &lt;img src="https://images-na.ssl-images-amazon.com/images/I/61h4UtvnGWL._SL1200_.jpg" width="90%" style="display: block; margin: auto;" /&gt;
@@ -396,35 +434,26 @@ The source for the definition of GitHub is [Wikipedia](https://en.wikipedia.org/
 
 2. [Version Control with Git(Hub)](https://raw.githack.com/uo-ec607/lectures/master/02-git/02-Git.html) by Grant McDerrmot.
 
-2. [Pro Git](https://git-scm.com/book/en/v2).
+3. [Pro Git](https://git-scm.com/book/en/v2).
 
 
 ---
 class: title-slide-section-blue, center, middle
 name: practice
 
-# Let's practice!
+# Let's Practice!
 -----------------
 
 
 ---
-# Your mission
 
-1. Open your first R project and publish it on GitHub.  
-
-2. Clone this course's lecture notes GitHub repository.
-
-
-
----
-
-# Suggested workflow for starting a new R project
+# Suggested workflow for starting a new (desktop) R project
 
 RStudio:
 
 1. Open RStudio.
 2. File -&gt; New Project -&gt; New Directory -&gt; New Project.
-3. Name your project under "Directory name:". Make sure to check "Create git repository".&lt;sup&gt;1&lt;/sup&gt;
+3. Name your project under "Directory name:". Make sure to check "Create git repository".
 
 GitHub Desktop:
 
@@ -433,14 +462,36 @@ GitHub Desktop:
 3. Set "Local path" to your RStudio project's folder.
 4. Publish local git repo on GitHub (choose private or public repo).
 
+---
 
-.footnote[
-&lt;sup&gt;1&lt;/sup&gt; RStudio automatically generates a `.gitignore` file that tells git which files to ignore (duh!). Click [here](https://raw.githack.com/uo-ec607/lectures/master/02-git/02-Git.html#57) for further details on how to configure what to ignore. 
-]
+# Suggested workflow for starting a new RStudio Cloud project
+
+
+1. Login to RStudio Cloud.
+2. Choose workspace (e.g., ml4econ-2020).
+3. Click on "New Project" (optional - from GitHub).
+4. Set up Git: Tools -&gt; Version Control -&gt; Project Setup -&gt; set "Version Control System" to "Git" and restart session.
+5. Introduce yourself to Git
+
+```r
+install.packages("usethis")
+
+library(usethis)
+
+use_git_config(
+  scope = "project",
+  user.name = "Jane",
+  user.email = "jane@example.org"
+)
+```
+(6. Some extra steps are needed in order to publish and sync this new project with GitHub.)
+
+
+
 
 ---
 
-# Git workflow
+# Suggested Git Workflow
 
 The __pull -&gt; stage -&gt; commit -&gt; push__ workflow:
 
@@ -457,7 +508,7 @@ The __pull -&gt; stage -&gt; commit -&gt; push__ workflow:
 
 
 ---
-# Clone and sync a remote GitHub repository
+# Clone and Sync a Remote GitHub Repository
 
 Cloning:
 
@@ -474,6 +525,24 @@ Syncing:
 4. __Pull__ any changes made on the remote repo.
 
 
+---
+# Your Mission
+
+1. Login to RStudio Cloud.
+
+2. Create your first R project.
+
+3. Initiate Git.&lt;sup&gt;1&lt;/sup&gt;
+
+4. Create a new RMarkdown file.
+
+5. Commit.
+
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt; RStudio automatically generates a `.gitignore` file that tells git which files to ignore (duh!). Click [here](https://raw.githack.com/uo-ec607/lectures/master/02-git/02-Git.html#57) for further details on how to configure what to ignore. 
+]
+
 
 
 ---
@@ -481,7 +550,8 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %&gt;% end()`
 
-[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/ml4econ/notes-spring2019/tree/master/03-reprod-vc)
+
+[&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/itamarcaspi/boi-data-science-2019/blob/master/02-reprod-vc/02-reprod-vc.Rmd)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -530,7 +600,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {

@@ -1,5 +1,8 @@
-Resources Machine Learning for Economists
+Resources for Machine Learning for Economists
 ================
+
+### Spring 2020 @ the Hebrew University of Jerusalem
+
 
 __NOTE:__ The following list of references and links may be useful. However, note that they _do not_ necessarily cover all the material we plan to cover in the class.
 

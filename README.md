@@ -78,9 +78,14 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 ## People
 
-+ [**Itamar Caspi**](https://itamarcaspi.rbind.io) is a Senior Economist and Head of the Monetary Analysis Unit at Bank of Israel's Research Department. In the past, he was a Central Bank Research Fellow at the Bank for International Settlements (BIS) and held a position at the Chief Economist Department of the Israeli Ministry of Finance. He has coauthored several R packages.
++ [**Itamar Caspi**](https://itamarcaspi.rbind.io) is a Senior Economist and Head of the Monetary Analysis Unit at Bank of Israel's Research Department. In the past, he was a Central Bank Research Fellow at the Bank for International Settlements (BIS) and held a position at the Chief Economist Department of the Israeli Ministry of Finance. He has coauthored several R packages. Itamar received his B.A. degree in economics and business administration from Ben-Gurion University, Beer Sheva, Israel, and an M.A. degree in economics from the Hebrew University of Jerusalem, Jerusalem, Israel. He is expected to receive his Ph.D. degree in Economics from Bar-Ilan University in 2020.
 
-+ [**Dor Goldenberg**]() 
++ **Dor Goldenberg** is as an asistant economist at the Bank of Israel's Research Department. Formerly, he worked at the Israel Competition Authority, where he specialised in health, industry, and military industries, among other fields. His focus is mainly on data science, machine learning and big data. He is currently studying for his MA in economics at the Hebrew University of Jerusalem. In addition, he is a T.A in several courses. He has earned a B.A in Philosophy, Political Science, and Economics from the Hebrew University.  
+
+
+## DataCamp
+
+We will provide course participants free access to [DataCamp](https://www.datacamp.com/), the most intuitive learning platform for data science and analytics. Learn any time, anywhere and become an expert in R, Python, SQL, and more. DataCamp’s learn-by-doing methodology combines short expert videos and hands-on-the-keyboard exercises to help learners retain knowledge. DataCamp offers 325+ courses by expert instructors on topics such as importing data, data visualization, and machine learning. They’re constantly expanding their curriculum to keep up with the latest technology trends and to provide the best learning experience for all skill levels. Join over 5 million learners around the world and close your skills gap.
 
 -----
 
