@@ -71,9 +71,13 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 ### Part II
 
-## [Problem Sets](https://github.com/ml4econ/problem-sets-2020)
+##  Problem Sets
 
-## [Readings](https://github.com/ml4econ/lecture-notes-2020)
+Can be found [here](https://github.com/ml4econ/problem-sets-2020).
+
+## [Readings]
+
+Can be found [here](https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md).
 
 
 ## People
