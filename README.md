@@ -8,8 +8,8 @@ Instructor: [Itamar Caspi](https://itamarcaspi.rbind.io)
 Teaching assistant: Dor Goldenberg
 
 :spiral_calendar: Spring semester, 2020
-:alarm_clock:     17:30 - 20:00
-:hotel:           TBA
+:alarm_clock:     17:30 - 20:15
+:hotel:           There's no palce like home...
 :writing_hand:    [github.com/ml4econ](https://github.com/ml4econ)
 
 :family:          [Moodle Discussion Forum](https://moodle2.cs.huji.ac.il/nu19/mod/forum/view.php?id=205609)
@@ -69,9 +69,21 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 3. [Reproducibiliy and Version Control](https://raw.githack.com/ml4econ/lecture-notes-2020/master/03-reprod-vc/03-reprod-vc.html)
 
-4. [A Typical ML Workflow](https://raw.githack.com/ml4econ/lecture-notes-2020/master/04-ml-workflow/04-ml-workflow.html)
+4. [A Typical (Supervised) ML Workflow](https://raw.githack.com/ml4econ/lecture-notes-2020/master/04-ml-workflow/04-ml-workflow.html)
+
+5. [Regression and Regularization]()
+
+6. [Classification]()
+
+7. [Nonparametrics]()
+
+8. [Unsupervised Learning]()
+
+9. [Text Analysis]()
 
 ### Part II
+
+TBA
 
 ## Problem Sets
 
@@ -80,8 +92,6 @@ Can be found [here](https://github.com/ml4econ/problem-sets-2020).
 ## Readings
 
 Can be found [here](https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md).
-
-
 
 ## DataCamp
 
