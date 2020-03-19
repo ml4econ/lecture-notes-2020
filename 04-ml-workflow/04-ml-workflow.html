@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
-    <title>A Typical (supervised) ML Workflow</title>
+    <title>04 - A Typical (Supervised) ML Workflow</title>
     <meta charset="utf-8" />
     <meta name="author" content="Itamar Caspi" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
@@ -14,9 +14,10 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# A Typical (supervised) ML Workflow
+# 04 - A Typical (Supervised) ML Workflow
+## ml4econ, HUJI 2020
 ### Itamar Caspi
-### December 2, 2019 (updated: 2019-12-07)
+### March ?, 2020 (updated: 2020-03-19)
 
 ---
 
@@ -35,7 +36,6 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   tidyverse,   # for data wrangling and visualization
   tidymodels,  # for data modeling
-  tune,        # for tuning hyperparameters
   GGally,      # for pairs plot
   skimr,       # for summary statistics
   here         # for referencing folders and files
@@ -271,7 +271,7 @@ name: eda
 
 ```r
 boston_train_raw %&gt;% 
-  skim() %&gt;% partition()
+  skim()
 ```
 
 (Does not come out well on these slides)
@@ -446,13 +446,14 @@ cv_splits
 We now estimate the CV-RMSE for each value of `\(\lambda\)`.
 
 ```r
-boston_cv &lt;- tune_grid(
+boston_results &lt;- tune_grid(
   boston_rec,
-  model = lm_mod,
-  rs    = cv_splits,
-  grid  = lambda_grid)
+  model     = lm_mod,
+  resamples = cv_splits,
+  grid      = lambda_grid
+)
 
-boston_cv
+boston_results
 ```
 
 ```
@@ -473,12 +474,8 @@ boston_cv
 Let's find the top-3 performing models
 
 ```r
-rmse_vals &lt;- boston_cv %&gt;% 
-  estimate() %&gt;% 
-  filter(.metric == "rmse") %&gt;% 
-  arrange(mean)
-
-head(rmse_vals, 3)
+ boston_results %&gt;% 
+  show_best(metric = "rmse", n = 3, maximize = FALSE)
 ```
 
 ```
@@ -492,22 +489,29 @@ head(rmse_vals, 3)
 
 &lt;midd-blockquote&gt; _"[I]n reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts..."_ .right[&amp;mdash; [__Rob J. Hyndman__](https://robjhyndman.com/hyndsight/crossvalidation/)] &lt;/midd-blockquote&gt;
 
+
+```r
+best_lambda &lt;- boston_results %&gt;% 
+  select_best(metric = "rmse", maximize = FALSE)
+
+best_lambda
+```
+
+```
+## # A tibble: 1 x 1
+##   lambda
+##    &lt;int&gt;
+## 1      4
+```
+
 ---
 # And Now Using a Graph
 
 .pull-left[
 
 ```r
-rmse_vals %&gt;% 
-  ggplot(aes(x = lambda, y = mean)) + 
-  geom_point() +
-  geom_line() +
-  geom_errorbar(
-    aes(ymin = mean - std_err, ymax = mean + std_err),
-    width = 0.2
-  ) +
-  labs(y = "CV-RMSE",
-       x = "Lambda")
+boston_results %&gt;% 
+  autoplot()
 ```
 ]
 .pull-right[
@@ -529,12 +533,10 @@ name: eval
 Prepare a recipe with the optimal `\(\lambda = 4\)`
 
 ```r
-boston_prep &lt;- 
-  recipe(medv ~ lstat + chas, data = boston_train_raw) %&gt;% 
-* step_poly(lstat, degree = 4) %&gt;%
-  step_dummy(chas) %&gt;% 
-  prep()
+boston_final &lt;- boston_rec %&gt;% 
+  finalize_recipe(best_lambda)
 ```
+
 
 ---
 # Apply the Recipe to the Training and Test Sets
@@ -542,10 +544,12 @@ boston_prep &lt;-
 `juice()` applies the recipe to the training set and `bake()` to the test set.
 
 ```r
-boston_train &lt;- boston_prep %&gt;% 
+boston_train &lt;- boston_final %&gt;% 
+  prep() %&gt;% 
   juice()
 
-boston_test &lt;- boston_prep %&gt;% 
+boston_test &lt;- boston_final %&gt;% 
+  prep() %&gt;% 
   bake(new_data = boston_test_raw)
 ```
 
@@ -667,6 +671,26 @@ For example, our predictions for high-end levels of `medv` are extremely biased 
 .pull-right[
 ![](04-ml-workflow_files/figure-html/unnamed-chunk-4-1..svg)&lt;!-- --&gt;
 ]
+
+---
+# (A shortcut)
+
+A much quicker way to get the test-set RMSE is using `tune`'s `final_fit()` function:
+
+```r
+boston_final %&gt;% 
+  last_fit(lm_mod, split = boston_split) %&gt;% 
+  collect_metrics() %&gt;% 
+  filter(.metric == "rmse")
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rmse    standard        5.94
+```
+
 
 
 ---

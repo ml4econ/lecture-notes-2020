@@ -1,8 +1,8 @@
 ---
-title: "A Typical (supervised) ML Workflow"
-subtitle: ""
+title: "04 - A Typical (Supervised) ML Workflow"
+subtitle: "ml4econ, HUJI 2020"
 author: "Itamar Caspi"
-date: "December 2, 2019 (updated: `r Sys.Date()`)"
+date: "March ?, 2020 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
@@ -46,7 +46,6 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   tidyverse,   # for data wrangling and visualization
   tidymodels,  # for data modeling
-  tune,        # for tuning hyperparameters
   GGally,      # for pairs plot
   skimr,       # for summary statistics
   here         # for referencing folders and files
@@ -335,13 +334,14 @@ cv_splits
 
 We now estimate the CV-RMSE for each value of $\lambda$.
 ```{r tune}
-boston_cv <- tune_grid(
+boston_results <- tune_grid(
   boston_rec,
   model     = lm_mod,
   resamples = cv_splits,
-  grid      = lambda_grid)
+  grid      = lambda_grid
+)
 
-boston_cv
+boston_results
 ```
 
 ---
@@ -349,31 +349,26 @@ boston_cv
 
 Let's find the top-3 performing models
 ```{r rmse}
-rmse_vals <- boston_cv %>% 
-  collect_metrics() %>% 
-  filter(.metric == "rmse") %>% 
-  arrange(mean)
-
-head(rmse_vals, 3)
+ boston_results %>% 
+  show_best(metric = "rmse", n = 3, maximize = FALSE)
 ```
 
 <midd-blockquote> _"[I]n reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts..."_ .right[&mdash; [__Rob J. Hyndman__](https://robjhyndman.com/hyndsight/crossvalidation/)] </midd-blockquote>
+
+```{r best_lambda}
+best_lambda <- boston_results %>% 
+  select_best(metric = "rmse", maximize = FALSE)
+
+best_lambda
+```
 
 ---
 # And Now Using a Graph
 
 .pull-left[
 ```{r cv_plot, echo=TRUE, fig.width=6, fig.show='hide', fig.retina=3}
-rmse_vals %>% 
-  ggplot(aes(x = lambda, y = mean)) + 
-  geom_point() +
-  geom_line() +
-  geom_errorbar(
-    aes(ymin = mean - std_err, ymax = mean + std_err),
-    width = 0.2
-  ) +
-  labs(y = "CV-RMSE",
-       x = "Lambda")
+boston_results %>% 
+  autoplot()
 ```
 ]
 .pull-right[
@@ -396,22 +391,22 @@ name: eval
 
 Prepare a recipe with the optimal $\lambda = 4$
 ```{r prep}
-boston_prep <- 
-  recipe(medv ~ lstat + chas, data = boston_train_raw) %>% 
-  step_poly(lstat, degree = 4) %>%                #<<
-  step_dummy(chas) %>% 
-  prep()
+boston_final <- boston_rec %>% 
+  finalize_recipe(best_lambda)
 ```
+
 
 ---
 # Apply the Recipe to the Training and Test Sets
 
 `juice()` applies the recipe to the training set and `bake()` to the test set.
 ```{r test_train}
-boston_train <- boston_prep %>% 
+boston_train <- boston_final %>% 
+  prep() %>% 
   juice()
 
-boston_test <- boston_prep %>% 
+boston_test <- boston_final %>% 
+  prep() %>% 
   bake(new_data = boston_test_raw)
 ```
 
@@ -491,6 +486,18 @@ For example, our predictions for high-end levels of `medv` are extremely biased 
 
 ```
 ]
+
+---
+# (A shortcut)
+
+A much quicker way to get the test-set RMSE is using `tune`'s `final_fit()` function:
+```{r}
+boston_final %>% 
+  last_fit(lm_mod, split = boston_split) %>%  #<<
+  collect_metrics() %>% 
+  filter(.metric == "rmse")
+```
+
 
 
 ---

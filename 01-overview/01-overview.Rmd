@@ -1,5 +1,5 @@
 ---
-title: "Course Overview"
+title: "01 - Course Overview"
 subtitle: "ml4econ, HUJI 2020"
 author: "Itamar Caspi"
 date: "March 15, 2020 (updated: `r Sys.Date()`)"
@@ -103,7 +103,7 @@ name: logistics
 
 
 ---
-# Class GitHub repository
+# ml4econ GitHub repository
 
 The class's GitHub repository: [https://github.com/ml4econ](https://github.com/ml4econ)
 
@@ -113,6 +113,18 @@ knitr::include_graphics("figs/repo.gif")
 
 ```
 
+---
+# ml4econ RStudio Cloud workspace
+
+[RStudio Cloud](https://rstudio.cloud/) is a hosted version of RStudio in the cloud that will make it easy for R and RStudio novices to learn data science and machine learning using R.
+
+You can access our ml4econ workspace [here](https://rstudio.cloud/spaces/50787/projects).
+
+```{r, echo=FALSE, out.width = "80%", fig.align='center'}
+
+knitr::include_graphics("figs/rstudiocloud.gif")
+
+```
 
 
 
@@ -295,6 +307,9 @@ knitr::include_graphics("figs/books.png")
 
 # More resources
 
+Can be found at our GitHub repo:
+
+[https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md](https://github.com/ml4econ/lecture-notes-2020/blob/master/resources.md)
 
 
 ---

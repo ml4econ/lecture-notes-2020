@@ -1,5 +1,5 @@
 ---
-title: "Reproducible Projects and Version Control"
+title: "03 - Reproducible Projects and Version Control"
 subtitle: "ml4econ, HUJI 2020"
 author: "Itamar Caspi"
 date: "March 15, 2020 (updated: `r Sys.Date()`)"
