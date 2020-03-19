@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
-    <title>Basic Machine Learning Concepts</title>
+    <title>02 - Basic Machine Learning Concepts</title>
     <meta charset="utf-8" />
     <meta name="author" content="Itamar Caspi" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
@@ -14,46 +14,34 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Basic Machine Learning Concepts
+# 02 - Basic Machine Learning Concepts
+## ml4econ, HUJI 2020
 ### Itamar Caspi
-### March 10, 2019 (updated: 2019-05-02)
+### March, 2019 (updated: 2020-03-19)
 
 ---
 
 
-# Replicating this presentation
-
-R packages used to produce this presentation
 
 
-```r
-library(tidyverse) # for data wrangling and plotting
-library(svglite) # for better looking plots
-library(kableExtra) # for better looking tables
-library(RefManageR) # for referencing
-library(truncnorm) # for drawing from a truncated normal distribution
-library(tidymodels) # for modelling
-library(knitr) # for presenting tables
-library(mlbench) # for the Boston Housing data
-library(ggdag) # for plotting DAGs
-```
+# Replicating this Presentation
 
-If you are missing a package, run the following command
-
-```
-install.packages("package_name")
-
-```
-
-Alernatively, you can just use the [pacman](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package that loads and installs packages:
+R packages used to produce this presentation. We use the [pacman](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package that loads and installs packages:
 
 
 ```r
 if (!require("pacman")) install.packages("pacman")
 
-pacman::p_load(tidyverse, svglite, kabelExtra, RefManageR,
-               truncnorm, tidymodels, knitr, mlbench, ggdag)
+pacman::p_load(
+  tidyverse,   # for data wrangling and visualization
+  tidymodels,  # for data modeling
+  RefManageR,  # for bibliography
+  truncnorm,   # for drawing from truncated normal
+  dagitty,     # for drawing DAGs
+  knitr        # for including graphics
+)
 ```
+
 
 
 
@@ -62,11 +50,10 @@ pacman::p_load(tidyverse, svglite, kabelExtra, RefManageR,
 
 ???
 
-
 Hat tip to Grant McDermott who introduced me the awesome __pacman__ package.
 
 ---
-# First things first: "Big Data"
+# First Things First: "Big Data"
 
 &lt;midd-blockquote&gt;"_A billion years ago modern homo sapiens emerged. A billion minutes ago, Christianity began. A billion seconds ago, the IBM PC was released.
 A billion Google searches ago ... was this morning._"  
@@ -96,9 +83,8 @@ The 4 Vs of big data:
 
 3. [Too complext? Regularize!](#regularization)  
 
-4. [Putting it All Together](#ml_workflow)
+4. [ML and Econometrics](#economics)  
 
-5. [What's in it for economists?](#economics)
 
 
 ---
@@ -141,7 +127,7 @@ Source: [https://wordstream-files-prod.s3.amazonaws.com/s3fs-public/machine-lear
 
 
 ---
-# An aside: ML and artificial intelligence (AI)
+# An Aside: ML and Artificial Intelligence (AI)
 
 
 &lt;img src="figs/DL-ML-AI.png" width="70%" style="display: block; margin: auto;" /&gt;
@@ -153,7 +139,7 @@ Source: [https://www.magnetic.com/blog/explaining-ai-machine-learning-vs-deep-le
 
 
 ---
-# Unsupervised learning
+# Unsupervised Learning
 
 In _unsupervised_ learning, the goal is to divide high-dimensional data into clusters that are __similar__ in their set of features `\((X)\)`.
 
@@ -177,7 +163,7 @@ Applications:
 
 
 ---
-# Reinforcement learning (RL)
+# Reinforcement Learning (RL)
  
 A definition by &lt;a name=cite-sutton2018rli&gt;&lt;/a&gt;[Sutton and Barto (2018)](#bib-sutton2018rli):
 
@@ -193,7 +179,7 @@ Prominent examples:
 - Self driving cars.
 
 ---
-# Supervised learning
+# Supervised Learning
 
 Consider the following data generating process (DGP):
 
@@ -211,7 +197,7 @@ Typical assumptions: (1) independent observations; (2) stable DGP across trainin
 
 ---
 
-# The goal of supervised learning
+# The Goal of Supervised Learning
 
 Use a labelled test set ( `\(X\)` and `\(Y\)` are known) to construct `\(\hat{f}(X)\)` such that it _generalizes_ to unseen test set (only `\(X\)` is known).
 
@@ -223,14 +209,14 @@ In this case, `\(Y=\{spam, ham\}\)`, and `\(X\)` is the email text.
 
 ---
 
-# Traditional vs. modern approach to supervised learning
+# Traditional vs. Modern Approach to Supervised Learning
 
 &lt;iframe width="100%" height="400" src="https://www.youtube.com/embed/xl3yQBhI6vY?start=405" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
 
 
 ---
 
-# Traditional vs. modern approach to supervised learning
+# Traditional vs. Modern Approach to Supervised Learning
 
 - Traditional: rules based, e.g., define dictionaries of "good" and "bad" words, and use it to classify text.
 
@@ -239,7 +225,7 @@ In this case, `\(Y=\{spam, ham\}\)`, and `\(X\)` is the email text.
 
 
 ---
-# More real world applications of ML
+# More Real World Applications of ML
 
 | task               | outcome `\((Y)\)`   | features `\((X)\)`                          |
 |--------------------|-------------------|-------------------------------------------|
@@ -257,7 +243,7 @@ In this case, `\(Y=\{spam, ham\}\)`, and `\(X\)` is the email text.
 
 A fascinating discussion on Amazon's shipping-then-shopping business model appears in the book ["Prediction Machines: The Simple Economics of Artificial Intelligence"](https://books.google.com/books/about/Prediction_Machines.html?id=wJY4DwAAQBAJ) &lt;a name=cite-agrawal2018prediction&gt;&lt;/a&gt;([Agrawal, Gans, and Goldfarb, 2018](#bib-agrawal2018prediction)).
 ---
-# Supervised learning algorithms
+# Supervised Learning Algorithms
 
 ML comes with a rich set of parametric and non-parametric prediction algorithms (approximate year of discovery in parenthesis):
 
@@ -271,7 +257,7 @@ ML comes with a rich set of parametric and non-parametric prediction algorithms 
 
 
 ---
-# So, why now?
+# So, Why Now?
 
 - ML methods are data-hungry and computationally expensive. Hence,
 
@@ -288,7 +274,7 @@ $$ \text{big data} + \text{computational advancements} = \text{the rise of ML}$$
 &lt;img src="figs/matrix.jpeg" width="25%" style="display: block; margin: auto;" /&gt;
 
 ---
-# Wait, is ML just glorified statistics?
+# Wait, is ML Just Glorified Statistics?
 
 .pull-left[
 &lt;img src="figs/frames.jpg" width="100%" style="display: block; margin: auto;" /&gt;
@@ -322,7 +308,7 @@ name: overfitting
 
 
 ---
-# Prediction accuracy
+# Prediction Accuracy
 
 Before we define overfitting, we need to be more explicit about what we mean by "good prediction."
 
@@ -339,7 +325,7 @@ Before we define overfitting, we need to be more explicit about what we mean by 
 - There are other possible forms of loss function (e.g., in classification, as the probability of misclassifying a case, or in terms of economic costs.)
 
 ---
-# The bias-variance decomposition
+# The Bias-Variance Decomposition
 
 Under a __squared error loss function__, an optimal predictive model is one that minimizes the _expected_ squared prediction error.  
 
@@ -353,7 +339,7 @@ where the expectation is over the training set _and_ `\((x^0,y^0)\)`.
 
 
 ---
-# Intuition behind the bias variance trade-off
+# Intuition Behind the Bias Variance Trade-off
 
 Imagine you are a teaching assistant grading exams. You grade the first exam. What is your best prediction of the next exam's grade?
 
@@ -373,7 +359,7 @@ This example is taken from Susan Athey's AEA 2018 lecture, ["Machine Learning an
 Imbens).
 
 ---
-# Exam grade prediction simulation
+# Exam Grade Prediction Simulation
 
 Let's Draw 1000 grade duplets from the following truncated normal distribution
 
@@ -398,51 +384,51 @@ Here a small sample from our simulated table:
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 86 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 838 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 75.5 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 306 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 73 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 78 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 73 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 71.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 399 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59.0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 822 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 97 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 100 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 97 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 83.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 417 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.5 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 297 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 87 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 95 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 87 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 78.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 794 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.5 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 456 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 749 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 83 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 78 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 83 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 76.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.5 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
 ---
-# The distribution of predictions
+# The Distribution of Predictions
 
 &lt;img src="02-basic-ml-concepts_files/figure-html/unnamed-chunk-11-1..svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# The MSE of grade predictions
+# The MSE of Grade Predictions
 
 &lt;table&gt;
  &lt;thead&gt;
@@ -453,20 +439,20 @@ Here a small sample from our simulated table:
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 325.895 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 213.9627 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 324.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 222.768 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
 
-Hence, the shrinked prediction turns out to be better (in the sense of MSE) then the unbiased one!
+Hence, the shrunk prediction turns out to be better (in the sense of MSE) then the unbiased one!
 
 __QUESTION:__ Is this a general result? Why?
 
 
 ---
-# Regressions and the bias-variance trade-off
+# Regressions and the Bias-Variance Trade-off
 
 Consider the following hypothetical DGP:
 
@@ -484,7 +470,7 @@ df &lt;- crossing(economist = c("A", "B", "C"),
 ```
 
 ---
-# Scatterplot of the data
+# Scatterplot of the Data
 
 .pull-left[
 
@@ -499,7 +485,7 @@ df %&gt;%
 ![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-13-1..svg)&lt;!-- --&gt;
 ]
 ---
-# Split the sample between 3 economists
+# Split the Sample Between Three Economists
 
 .pull-left[
 
@@ -527,40 +513,40 @@ knitr::kable(sample_n(df,6), format = "html")
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; A &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 98.89330 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 49.65828 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; C &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 84.94055 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 35.73597 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; C &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 97.83834 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 43.40877 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 96.21703 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 56.77998 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; A &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 102.69686 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 53.47575 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; C &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 109.78834 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 67.43844 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.34957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59.47988 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; A &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 103.71018 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 52.37188 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.35239 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 57.47065 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; B &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 110.42183 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 45.25598 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; A &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 91.38508 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.87680 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; C &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.26113 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.96492 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -570,7 +556,7 @@ knitr::kable(sample_n(df,6), format = "html")
 ]
 
 ---
-# Underffiting: high bias, low variance
+# Underffiting: High Bias, Low Variance
 
 
 .pull-left[
@@ -597,7 +583,7 @@ df %&gt;%
 ![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-15-1..svg)&lt;!-- --&gt;
 ]
 ---
-# Overfitting: low Bias, high variance
+# Overfitting: Low Bias, High Variance
 
 .pull-left[
 The model: high-degree polynomial
@@ -625,7 +611,7 @@ df %&gt;%
 ]
 
 ---
-# "Justfitting": bias and Variance are just right
+# "Justfitting": Bias and Variance are Just Right
 
 .pull-left[
 The model: linear regression
@@ -652,7 +638,7 @@ df %&gt;%
 ![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-17-1..svg)&lt;!-- --&gt;
 ]
 ---
-# The typical bias-variance trade-off in ML
+# The Typical Bias-Variance Trade-off in ML
 
 
 Typically, ML models strive to find levels of bias and variance that are "just right":
@@ -678,7 +664,7 @@ In high-dimensional settings ( `\(n\ll p\)` )
 &lt;midd-blockquote&gt; `\(n\ll p\)` is prevalent in big-data &lt;/midd-blockquote&gt;
 
 ---
-# Bias-variance trade-off in low-dimensional settings
+# Bias-Variance Trade-off in Low-dimensional Settings
 
 .pull-left[
 The model is a 3rd degree polynomial
@@ -721,7 +707,7 @@ Regularization typically results in simpler and more accurate (though â€œwrongâ€
 
 ---
 
-# How to penalize overfit?
+# How to Penalize Overfit?
 
 The test set MSE is _unobservable_. How can we tell if a model overfits?  
 
@@ -754,7 +740,7 @@ __CONCERNS__: (1) the algorithm might be sensitive to the choice of training and
 
 ---
 
-# k-fold cross-validation
+# k-fold Cross-validation
 
 Split the training set into `\(k\)` roughly equal-sized parts ( `\(k=5\)` in this example):
 
@@ -766,7 +752,7 @@ Approximate the test-MSE using the mean of `\(k\)` split-MSEs
 
 ---
 
-# Which model to choose?
+# Which Model to Choose?
 
 
 - Recall that the test-MSE is unobservable.
@@ -779,7 +765,7 @@ Approximate the test-MSE using the mean of `\(k\)` split-MSEs
 
 ---
 
-# Sounds familiar?
+# Sounds Familiar?
 
 - In a way, you probably already know this:  
 
@@ -793,234 +779,9 @@ Approximate the test-MSE using the mean of `\(k\)` split-MSEs
 
 ---
 class: title-slide-section-blue, center, middle
-name: ml_workflow
-
-# Putting it All Together
-
-
----
-
-# Toy problem: Predicting Boston housing prices
-
-
-.pull-left[
-
-We will use the `BostonHousing`: housing data for 506 census tracts of Boston from the 1970 census &lt;a name=cite-harrison1978hedonic&gt;&lt;/a&gt;([Harrison Jr and Rubinfeld, 1978](#bib-harrison1978hedonic))
-
-- `medv` (outcome): median value of owner-occupied homes in USD 1000's.
-- `lstat`(predictor): percentage of lower status of the population.
-
-__OBJECTIVE:__ Find the best prediction model within the class of polynomial regression.
-
-Examples: in green: linear relation `\((\lambda=1)\)`; in blue, `\(\lambda = 10\)`.
-
-
-
-]
-
-.pull-right[
-![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-22-1..svg)&lt;!-- --&gt;
-]
- 
- 
----
-# Step 1: The train-test split
-
-We will use the `initial_split()`, `training()` and `testing()` functions from the [rsample](https://tidymodels.github.io/rsample/) package to perform an initial train-test split
-
-
-```r
-set.seed(1203) # for reproducability
-
-df_split &lt;- initial_split(df, prop = 0.75)
-df_split
-```
-
-```
-## &lt;380/126/506&gt;
-```
-
-
-
-```r
-training_df &lt;- training(df_split) 
-testing_df  &lt;- testing(df_split)
-
-head(training_df, 5)
-```
-
-```
-## # A tibble: 5 x 2
-##    medv lstat
-##   &lt;dbl&gt; &lt;dbl&gt;
-## 1  21.6  9.14
-## 2  34.7  4.03
-## 3  36.2  5.33
-## 4  28.7  5.21
-## 5  22.9 12.4
-```
-
----
-# Step 2: Prepare 10 folds for cross-validation
-
-We will use the `vfold-cv()` function from the [rsample](https://tidymodels.github.io/rsample/) package to split the training set to 10-folds:
-
-
-```r
-cv_data &lt;- training_df %&gt;% 
-  vfold_cv(v = 10) %&gt;%  
-  mutate(train     = map(splits, ~training(.x)), 
-         validate  = map(splits, ~testing(.x)))
-cv_data
-```
-
-```
-## #  10-fold cross-validation 
-## # A tibble: 10 x 4
-##    splits           id     train              validate         
-##  * &lt;list&gt;           &lt;chr&gt;  &lt;list&gt;             &lt;list&gt;           
-##  1 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  2 &lt;split [342/38]&gt; Fold02 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  3 &lt;split [342/38]&gt; Fold03 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  4 &lt;split [342/38]&gt; Fold04 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  5 &lt;split [342/38]&gt; Fold05 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  6 &lt;split [342/38]&gt; Fold06 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  7 &lt;split [342/38]&gt; Fold07 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  8 &lt;split [342/38]&gt; Fold08 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-##  9 &lt;split [342/38]&gt; Fold09 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-## 10 &lt;split [342/38]&gt; Fold10 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;
-```
-
----
-# Step 3: Set search range for lambda
-
-We need to vary the polynomial degree parameter `\((\lambda)\)` when building our models on the train data. In this example, we will set the range between 1 and 10:
-
-
-```r
-cv_tune &lt;- cv_data %&gt;% 
-  crossing(lambda = 1:10)
-
-cv_tune
-```
-
-```
-## # A tibble: 100 x 5
-##    splits           id     train              validate          lambda
-##    &lt;list&gt;           &lt;chr&gt;  &lt;list&gt;             &lt;list&gt;             &lt;int&gt;
-##  1 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      1
-##  2 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      2
-##  3 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      3
-##  4 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      4
-##  5 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      5
-##  6 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      6
-##  7 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      7
-##  8 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      8
-##  9 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;      9
-## 10 &lt;split [342/38]&gt; Fold01 &lt;tibble [342 x 2]&gt; &lt;tibble [38 x 2]&gt;     10
-## # ... with 90 more rows
-```
-
----
-# Step 4: Estimate CV-MSE
-
-We now estimate the CV-MSE for each value of `\(\lambda\)`.
-
-
-```r
-cv_mse &lt;- cv_tune %&gt;% 
-  mutate(model = map2(lambda, train, ~ lm(medv ~ poly(lstat, .x), data = .y))) %&gt;% 
-  mutate(predicted = map2(model, validate, ~ augment(.x, newdata = .y))) %&gt;% 
-  unnest(predicted) %&gt;% 
-  group_by(lambda) %&gt;% 
-  summarise(mse = mean((.fitted - medv)^2))
-
-cv_mse
-```
-
-```
-## # A tibble: 10 x 2
-##    lambda   mse
-##     &lt;int&gt; &lt;dbl&gt;
-##  1      1  39.0
-##  2      2  31.3
-##  3      3  30.1
-##  4      4  28.6
-##  5      5  28.1
-##  6      6  28.3
-##  7      7  28.6
-##  8      8  29.3
-##  9      9  28.3
-## 10     10  34.5
-```
-
----
-# Step 5: Find the best model
-
-Recall that the best performing model minimizes the CV-MSE.
- 
-&lt;img src="02-basic-ml-concepts_files/figure-html/unnamed-chunk-28-1..svg" width="25%" style="display: block; margin: auto;" /&gt;
-
-&lt;midd-blockquote&gt; _"[I]n reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts..."_ .right[&amp;mdash; [__Rob J. Hyndman__](https://robjhyndman.com/hyndsight/crossvalidation/)] &lt;/midd-blockquote&gt;
-
----
-
-# Step 6: Use the test set to evaluate the best model
-
-
-Fit the best model ( `\(\lambda = 5\)`) to the training set, make predictions on the test set, and calculate the test root mean square error (test-RMSE):
-
-&lt;img src="figs/train_test.png" width="50%" style="display: block; margin: auto;" /&gt;
-
-
-```r
-training_df %&gt;% 
-  lm(medv ~ poly(lstat, 5), data = .) %&gt;%  # fit model
-  augment(newdata = testing_df) %&gt;%        # predict unseen data
-  rmse(medv, .fitted)                  # evaluate accuracy
-```
-
-```
-## # A tibble: 1 x 3
-##   .metric .estimator .estimate
-##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rmse    standard        5.11
-```
-
-
-&gt; __NOTE__: the test set RMSE is an estimator of the expected squared prediction error on unseen data _given_ the best model.
-
----
-# An aside: plot your residuals
-
-.pull-left[
-
-The distribution of the prediction errors `\((y_i-\hat{y}_i)\)` are another important sources of information about prediction quality.
-
-
-```r
-training_df %&gt;% 
-  lm(medv ~ poly(lstat, 5), data = .) %&gt;% 
-  augment(newdata = testing_df) %&gt;%  
-  mutate(error = medv - .fitted) %&gt;% 
-  ggplot(aes(medv, error)) +
-  geom_point() +
-  labs(y = expression(y[i] - hat(y)[i]))
-```
-
-For example, see how biased the prediction for high levels of `medv` are.
-
-]
-
-.pull-right[
-![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-30-1..svg)&lt;!-- --&gt;
-]
-
----
-class: title-slide-section-blue, center, middle
 name: economics
 
-# ML and econometrics
+# ML and Causality
 
 
 ---
@@ -1033,7 +794,7 @@ Apart from jargon (Training set vs. in-sample, test-set vs. out of sample, learn
 | :----------------- | :---------------------- |
 | prediction | causal inference |
 | `\(\hat{Y}\)` | `\(\hat{\beta}\)` |
-| minimize prediction error | unbiasedness, consictency, efficiency |
+| minimize prediction error | unbiasedness, consistency, efficiency |
 | --- | statistical inference |
 | stable environment | counterfactual analysis |
 | black-box | structural |
@@ -1069,7 +830,7 @@ __TOY PROBLEM:__ Say that we find in the data that `coffee` is a good predictor 
 
 ]
 .pull-right[
-![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-31-1..svg)&lt;!-- --&gt;
+![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-22-1..svg)&lt;!-- --&gt;
 ]
 
 ???
@@ -1091,7 +852,7 @@ __TOY PROBLEM:__ Say that we find in the data that `coffee` is a good predictor 
 
 ]
 .pull-right[
-![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-32-1..svg)&lt;!-- --&gt;
+![](02-basic-ml-concepts_files/figure-html/unnamed-chunk-23-1..svg)&lt;!-- --&gt;
 ]
 
 ???
@@ -1126,7 +887,7 @@ class: .title-slide-final, center, inverse, middle
 
 &lt;a
 name=bib-agrawal2018prediction&gt;&lt;/a&gt;[[1]](#cite-agrawal2018prediction)
-A. Agrawal, J. Gans and A. Goldfarb. _Prediction Machines: The
+A. Agrawal, J. Gans, and A. Goldfarb. _Prediction Machines: The
 Simple Economics of Artificial Intelligence_. Harvard Business
 Review Press, 2018.
 
@@ -1141,22 +902,16 @@ L. Breiman. "Statistical modeling: The two cultures (with comments
 and a rejoinder by the author)". In: _Statistical science_ 16.3
 (2001), pp. 199-231.
 
-&lt;a
-name=bib-harrison1978hedonic&gt;&lt;/a&gt;[[4]](#cite-harrison1978hedonic)
-D. Harrison Jr and D. L. Rubinfeld. "Hedonic housing prices and
-the demand for clean air". In: _Journal of environmental economics
-and management_ 5.1 (1978), pp. 81-102.
-
-&lt;a name=bib-shmueli2010explain&gt;&lt;/a&gt;[[5]](#cite-shmueli2010explain)
+&lt;a name=bib-shmueli2010explain&gt;&lt;/a&gt;[[4]](#cite-shmueli2010explain)
 G. Shmueli. "To explain or to predict?" In: _Statistical science_
 25.3 (2010), pp. 289-310.
 
----
-# References
-
-&lt;a name=bib-sutton2018rli&gt;&lt;/a&gt;[[1]](#cite-sutton2018rli) R. S.
+&lt;a name=bib-sutton2018rli&gt;&lt;/a&gt;[[5]](#cite-sutton2018rli) R. S.
 Sutton and A. G. Barto. _Reinforcement Learning: An Introduction_.
 MIT Press, 2018.
+
+---
+# References
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -1205,7 +960,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {
