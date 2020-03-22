@@ -37,3 +37,11 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# lecture notes folders
+
+05-regression-regularization/*.*
+06-classification/*.*
+07-nonparametrics/*.*
+08-unsupervised-learning/*.*
+09-text-analysis/*.*

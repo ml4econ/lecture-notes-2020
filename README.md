@@ -45,8 +45,8 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 | Week                  | Topic                                      |
 |:----------------------|:-------------------------------------------|
-| [**1**](#week-1)      | Course Overview & Basic ML Concepts        |
-| [**2**](#week-2)      | Reproducibiliy and Version Control         |
+| [**1**](#week-1)      | Course Overview & Reproducibility          |
+| [**2**](#week-2)      | Basic ML Concepts                          |
 | [**3**](#week-3)      | Regression and Regularization              |
 | [**4**](#week-4)      | Classification                             |
 | [**5**](#week-5)      | Non-parametrics                            |
@@ -65,9 +65,9 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 1. [Course Overview](https://raw.githack.com/ml4econ/lecture-notes-2020/master/01-overview/01-overview.html)  
 
-2. [Basic ML Concepts](https://raw.githack.com/ml4econ/lecture-notes-2020/master/02-basic-ml-concepts/02-basic-ml-concepts.html)
+2. [Reproducibility and Version Control](https://raw.githack.com/ml4econ/lecture-notes-2020/master/02-reprod-vc/02-reprod-vc.html)
 
-3. [Reproducibiliy and Version Control](https://raw.githack.com/ml4econ/lecture-notes-2020/master/03-reprod-vc/03-reprod-vc.html)
+3. [Basic ML Concepts](https://raw.githack.com/ml4econ/lecture-notes-2020/master/03-basic-ml-concepts/03-basic-ml-concepts.html)
 
 4. [A Typical (Supervised) ML Workflow](https://raw.githack.com/ml4econ/lecture-notes-2020/master/04-ml-workflow/04-ml-workflow.html)
 

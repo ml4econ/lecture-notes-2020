@@ -224,8 +224,8 @@ To do that we will need to understand
 
 | Week                  | Topic                                      |
 |:----------------------|:-------------------------------------------|
-| [**1**](#week-1)      | Course Overview & Basic ML Concepts        |
-| [**2**](#week-2)      | Reproducibiliy and Version Control         |
+| [**1**](#week-1)      | Course Overview & Reproducibility          |
+| [**2**](#week-2)      | Basic ML Concepts                          |
 | [**3**](#week-3)      | Regression and Regularization              |
 | [**4**](#week-4)      | Classification                             |
 | [**5**](#week-5)      | Non-parametrics                            |
