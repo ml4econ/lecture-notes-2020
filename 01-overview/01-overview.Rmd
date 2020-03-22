@@ -168,6 +168,45 @@ Please feel free to contact us by
 class: title-slide-section-blue, center, middle
 name: about
 
+
+---
+
+# Slack (?)
+
+
+.pull-left[
+
+```{r, echo=FALSE, out.width = "50%", fig.align='center'}
+knitr::include_graphics("https://seeklogo.net/wp-content/uploads/2019/01/new-Slack-logo-vector.png")
+```
+
+_"Slack is a collaboration hub that can replace email to help you and your team work together seamlessly. It’s designed to support the way people naturally work together, so you can collaborate with people online as efficiently as you do face-to-face."_
+
+]
+
+.pull-right[
+
+[Sign-up and download](https://slack.com)
+
+
+[How to use Slack (YouTube)](https://www.youtube.com/watch?v=7YUTc4Cigc8)
+
+Our workspace's name is `ml4econ`. I'll send you an invitation soon. We will host 4 channels:
+
+- `#general` - questions about the lectures
+- `#problem-sets`- questions about the problem-sets
+- `#projects` - questions about the projects
+- `#test` - questions about the test
+
+
+]
+
+
+---
+class: title-slide-section-blue, center, middle
+name: about
+
+
 # About the Course
 
 ---
