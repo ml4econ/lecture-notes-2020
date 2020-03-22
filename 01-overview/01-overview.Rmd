@@ -439,7 +439,7 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %>% end()`
 
-[<i class="fa fa-github"></i> Source code]()  
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2020/blob/master/01-overview/01-overview.Rmd)  
 
 ---
 # References
