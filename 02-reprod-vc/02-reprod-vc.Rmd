@@ -587,4 +587,6 @@ class: .title-slide-final, center, inverse, middle
 
 [<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2020/tree/master/02-reprod-vc)  
 
+[<i class="fa fa-cloud"></i> RStudio Cloud Project](https://rstudio.cloud/spaces/50787/project/987890) 
+
 

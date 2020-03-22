@@ -441,6 +441,8 @@ class: .title-slide-final, center, inverse, middle
 
 [<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2020/blob/master/01-overview/01-overview.Rmd)  
 
+[<i class="fa fa-cloud"></i> RStudio Cloud Project](https://rstudio.cloud/spaces/50787/project/987890) 
+
 ---
 # References
 
