@@ -525,7 +525,7 @@ use_git_config(
 
 ---
 
-# Suggested Git Workflow
+# Suggested Git Workflow (Optional)
 
 The __pull -> stage -> commit -> push__ workflow:
 
@@ -542,7 +542,7 @@ The __pull -> stage -> commit -> push__ workflow:
 
 
 ---
-# Clone and Sync a Remote GitHub Repository
+# Clone and Sync a Remote GitHub Repository (Optional)
 
 Cloning:
 
