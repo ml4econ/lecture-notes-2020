@@ -2,7 +2,7 @@
 title: "04 - A Typical (Supervised) ML Workflow"
 subtitle: "ml4econ, HUJI 2020"
 author: "Itamar Caspi"
-date: "March ?, 2020 (updated: `r Sys.Date()`)"
+date: "March 22, 2020 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
