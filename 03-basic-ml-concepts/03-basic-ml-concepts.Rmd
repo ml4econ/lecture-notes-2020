@@ -497,8 +497,8 @@ df <- crossing(economist = c("A", "B", "C"),
 ```{r scatter, fig.show='hide', fig.retina=3}
 
 df %>% 
-  ggplot(aes(y = income,
-             x = consumption)) +
+  ggplot(aes(y = consumption,
+             x = income)) +
   geom_point()
   
 ```
