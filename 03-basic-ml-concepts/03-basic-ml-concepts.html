@@ -97,7 +97,7 @@ name: concepts
 ---
 # So, what is ML?
 
-A concise definition by [Athey (2018)](#bib-athey2018the):
+A concise definition by &lt;a name=cite-athey2018the&gt;&lt;/a&gt;[Athey (2018)](#bib-athey2018the):
 
 &lt;midd-blockquote&gt;
 "...[M]achine learning is a field
@@ -165,7 +165,7 @@ Applications:
 ---
 # Reinforcement Learning (RL)
  
-A definition by [Sutton and Barto (2018)](#bib-sutton2018rli):
+A definition by &lt;a name=cite-sutton2018rli&gt;&lt;/a&gt;[Sutton and Barto (2018)](#bib-sutton2018rli):
 
 &lt;midd-blockquote&gt;
 _"Reinforcement learning is learning what to do—how to map situations to actions—so as to maximize a numerical reward signal. The learner is not told which actions to take, but instead must discover which actions yield the most reward by trying them."_
@@ -241,7 +241,7 @@ In this case, `\(Y=\{spam, ham\}\)`, and `\(X\)` is the email text.
 
 ???
 
-A fascinating discussion on Amazon's shipping-then-shopping business model appears in the book ["Prediction Machines: The Simple Economics of Artificial Intelligence"](https://books.google.com/books/about/Prediction_Machines.html?id=wJY4DwAAQBAJ) ([Agrawal, Gans, and Goldfarb, 2018](#bib-agrawal2018prediction)).
+A fascinating discussion on Amazon's shipping-then-shopping business model appears in the book ["Prediction Machines: The Simple Economics of Artificial Intelligence"](https://books.google.com/books/about/Prediction_Machines.html?id=wJY4DwAAQBAJ) &lt;a name=cite-agrawal2018prediction&gt;&lt;/a&gt;([Agrawal, Gans, and Goldfarb, 2018](#bib-agrawal2018prediction)).
 ---
 # Supervised Learning Algorithms
 
@@ -281,7 +281,7 @@ $$ \text{big data} + \text{computational advancements} = \text{the rise of ML}$$
 ]
 
 .pull-right[
-The "two cultures" ([Breiman, 2001](#bib-breiman2001statistical)):
+The "two cultures" &lt;a name=cite-breiman2001statistical&gt;&lt;/a&gt;([Breiman, 2001](#bib-breiman2001statistical)):
 
 - Statisticians assume a data generating process and try to learn  about it using data (parameters, confidence intervals, assumptions.) 
 
@@ -384,39 +384,39 @@ Here a small sample from our simulated table:
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 484 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 62 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 81 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 75.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.5 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 326 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 53 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 98 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 53 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 61.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 978 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.5 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 261 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 76 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 80 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 76 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 73.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 821 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 545 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 725 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 84 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 65 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 67.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 623 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 57 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 84 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 57 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 63.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 136 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.0 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -439,8 +439,8 @@ Here a small sample from our simulated table:
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 329.434 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 216.2492 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 309.999 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 212.638 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -476,8 +476,8 @@ df &lt;- crossing(economist = c("A", "B", "C"),
 
 ```r
 df %&gt;% 
-  ggplot(aes(y = income,
-             x = consumption)) +
+  ggplot(aes(y = consumption,
+             x = income)) +
   geom_point()
 ```
 ]
@@ -857,7 +857,7 @@ __TOY PROBLEM:__ Say that we find in the data that `coffee` is a good predictor 
 
 ???
 
-The title of this slide "To Explain or to Predict?" is the name of a must-read [paper](https://projecteuclid.org/euclid.ss/1294167961) by [Shmueli (2010)](#bib-shmueli2010explain) that clarifies the distinction between predicting and explaining.
+The title of this slide "To Explain or to Predict?" is the name of a must-read [paper](https://projecteuclid.org/euclid.ss/1294167961) by &lt;a name=cite-shmueli2010explain&gt;&lt;/a&gt;[Shmueli (2010)](#bib-shmueli2010explain) that clarifies the distinction between predicting and explaining.
 
 ---
 # ML in aid of econometrics
