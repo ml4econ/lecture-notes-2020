@@ -1,0 +1,109 @@
+---
+title: "Prepare browser data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r pacman, message=FALSE, warning=FALSE, eval=TRUE}
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,   # for data wrangling and visualization
+  here        # for referencing folders and files
+)
+```
+
+```{r}
+set.seed(1203)
+```
+
+# Load browser data
+
+```{r}
+web_raw <- here("05-regression-regularization/data","browser-domains.csv") %>% 
+  read_csv()
+```
+
+Read in the actual website names and relabel site factor
+```{r}
+sitenames_raw <- here("05-regression-regularization/data", "browser-sites.txt") %>% 
+  read_tsv(col_names = FALSE)
+```
+
+```{r}
+spend_raw <- here("05-regression-regularization/data", "browser-totalspend.csv") %>% 
+  read_csv()
+```
+
+# Data preprocessing
+
+```{r}
+sitenames <- sitenames_raw %>% 
+  pull()
+```
+
+```{r}
+web <- web_raw %>% 
+  mutate(
+    id = as_factor(id),
+    site_name = factor(site, levels = 1:length(sitenames), labels = sitenames)
+  ) %>% 
+  group_by(id) %>% 
+  mutate(visitpercent = 100 * visits / sum(visits)) %>% 
+  ungroup()
+```
+
+```{r}
+spend <- spend_raw %>% 
+  mutate(log_spend = log(spend))
+```
+
+```{r}
+web_wide <- web %>% 
+  select(id, site_name, visitpercent) %>% 
+  arrange(id) %>% 
+  pivot_wider(
+    names_from = site_name,
+    values_from = visitpercent,
+    values_fill = list(visitpercent = 0)
+  )
+```
+
+random sample of size 1000 obs X 250 features
+```{r}
+vars_idx <- sample(1:1000, 250)
+obs_idx  <- sample(1:10000, 1000)
+```
+
+generate response and feature matrices
+```{r}
+Xweb <- web_wide %>% 
+  select(-id) %>%
+  select(vars_idx) %>% 
+  slice(obs_idx) %>%
+  as.matrix()
+
+Yweb <- spend %>% 
+  select(log_spend) %>%
+  slice(obs_idx) %>% 
+  as.matrix()
+```
+
+# Save processed data
+
+```{r}
+save(
+  Xweb,
+  file = here("05-regression-regularization/data","Xweb.Rdata")
+)
+
+save(
+  Yweb,
+  file = here("05-regression-regularization/data","Yweb.Rdata")
+)
+```
+

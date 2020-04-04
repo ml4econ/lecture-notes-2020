@@ -40,7 +40,6 @@ vignettes/*.pdf
 
 # lecture notes folders
 
-05-regression-regularization/*.*
 06-classification/*.*
 07-nonparametrics/*.*
 08-unsupervised-learning/*.*
