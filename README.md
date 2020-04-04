@@ -71,7 +71,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 4. [A Typical (Supervised) ML Workflow](https://raw.githack.com/ml4econ/lecture-notes-2020/master/04-ml-workflow/04-ml-workflow.html)
 
-5. [Regression and Regularization](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-regression-regularization/04-regression-regularization.html)
+5. [Regression and Regularization](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-regression-regularization/05-regression-regularization.html)
 
 6. [Classification]()
 
