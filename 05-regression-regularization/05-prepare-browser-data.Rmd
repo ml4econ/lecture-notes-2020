@@ -1,12 +1,26 @@
 ---
-title: "Prepare browser data"
-output: html_document
+title: "Prapare Browser Data"
+author: "Itamar Caspi"
+date: '(updated: `r Sys.Date()`)'
+output:
+  html_document:
+    code_folding: show
+    highlight: haddock
+    keep_md: no
+    theme: journal
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(eval = TRUE,
+                      echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      comment = NA,
+                      dpi = 300)
 ```
-
 
 ```{r pacman, message=FALSE, warning=FALSE, eval=TRUE}
 if (!require("pacman")) install.packages("pacman")
@@ -17,36 +31,36 @@ pacman::p_load(
 )
 ```
 
-```{r}
+```{r seed}
 set.seed(1203)
 ```
 
 # Load browser data
 
-```{r}
+```{r read_web}
 web_raw <- here("05-regression-regularization/data","browser-domains.csv") %>% 
   read_csv()
 ```
 
 Read in the actual website names and relabel site factor
-```{r}
+```{r read_sitenames}
 sitenames_raw <- here("05-regression-regularization/data", "browser-sites.txt") %>% 
   read_tsv(col_names = FALSE)
 ```
 
-```{r}
+```{r read_spend}
 spend_raw <- here("05-regression-regularization/data", "browser-totalspend.csv") %>% 
   read_csv()
 ```
 
 # Data preprocessing
 
-```{r}
+```{r sitenames_list}
 sitenames <- sitenames_raw %>% 
   pull()
 ```
 
-```{r}
+```{r web_proc}
 web <- web_raw %>% 
   mutate(
     id = as_factor(id),
@@ -57,12 +71,12 @@ web <- web_raw %>%
   ungroup()
 ```
 
-```{r}
+```{r log_spend}
 spend <- spend_raw %>% 
   mutate(log_spend = log(spend))
 ```
 
-```{r}
+```{r web_to_wide}
 web_wide <- web %>% 
   select(id, site_name, visitpercent) %>% 
   arrange(id) %>% 
@@ -74,13 +88,13 @@ web_wide <- web %>%
 ```
 
 random sample of size 1000 obs X 250 features
-```{r}
+```{r sample}
 vars_idx <- sample(1:1000, 250)
 obs_idx  <- sample(1:10000, 1000)
 ```
 
 generate response and feature matrices
-```{r}
+```{r data_matrix}
 Xweb <- web_wide %>% 
   select(-id) %>%
   select(vars_idx) %>% 
@@ -95,7 +109,7 @@ Yweb <- spend %>%
 
 # Save processed data
 
-```{r}
+```{r save}
 save(
   Xweb,
   file = here("05-regression-regularization/data","Xweb.Rdata")
