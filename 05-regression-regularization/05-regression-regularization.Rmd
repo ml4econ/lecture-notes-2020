@@ -274,13 +274,12 @@ name: linear
 
 # Estimation
 
-_Penalized_ (or _regularized_) sum of squares minimizes
+_Penalized_ (or _regularized_) sum of squares minimizes solves
 
 $$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }R(\beta) \leq t$$
 where $R(\cdot)$ is a penalty function that measures __expressiveness__ of the model.
 
 As the number of features grow, linear models become _more_ expressive. 
-
 
 
 ---
@@ -303,7 +302,7 @@ Suppose $\boldsymbol{\beta}$ is a $k\times 1$ vector with typical element $\beta
 It is often convenient to rewrite the regularization problem in the Lagrangian form:
 
 $$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda R(\beta)$$
-where 
+__NOTE:__ There is one-to-one correspondence between $\lambda$ and $t$.
 
 |  Method          |  $R(\boldsymbol{\beta})$             | 
 |:-----------------|:-------------------------------------|
@@ -433,8 +432,6 @@ Ridge regression was introduced into the statistics literature by Hoerl and Kenn
 $$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \lVert\boldsymbol{\beta}\rVert_2^2$$
 or in a budget constraint form:
 $$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }\lVert\boldsymbol{\beta}\rVert_2^2 \leq t$$
-
-__NOTE:__ There is one-to-one correspondence between $\lambda$ and $t$.
 
 Ridge puts a "budget constraint" on the sum of squared betas. This constraint incorporate the cost of being "too far away" from the null hypothesis of $\beta_j=0$ (what if this assumption is wrong null?)
 

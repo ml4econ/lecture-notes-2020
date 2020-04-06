@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 # 04 - A Typical (Supervised) ML Workflow
 ## ml4econ, HUJI 2020
 ### Itamar Caspi
-### April 5, 2020 (updated: 2020-04-05)
+### April 5, 2020 (updated: 2020-04-06)
 
 ---
 
@@ -490,20 +490,6 @@ Let's find the top-3 performing models
 &lt;midd-blockquote&gt; _"[I]n reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts..."_ .right[&amp;mdash; [__Rob J. Hyndman__](https://robjhyndman.com/hyndsight/crossvalidation/)] &lt;/midd-blockquote&gt;
 
 
-```r
-best_lambda &lt;- boston_results %&gt;% 
-  select_best(metric = "rmse", maximize = FALSE)
-
-best_lambda
-```
-
-```
-## # A tibble: 1 x 1
-##   lambda
-##    &lt;int&gt;
-## 1      4
-```
-
 ---
 # And Now Using a Graph
 
@@ -529,6 +515,22 @@ name: eval
 ---
 
 # Use the Test Set to Evaluate the Best Model
+
+Select the optimal `\(\lambda\)`
+
+```r
+best_lambda &lt;- boston_results %&gt;% 
+  select_best(metric = "rmse", maximize = FALSE)
+
+best_lambda
+```
+
+```
+## # A tibble: 1 x 1
+##   lambda
+##    &lt;int&gt;
+## 1      4
+```
 
 Prepare a recipe with the optimal `\(\lambda = 4\)`
 

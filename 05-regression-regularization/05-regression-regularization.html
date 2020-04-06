@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 # 05 - Regression and Regularization
 ## ml4econ, HUJI 2020
 ### Itamar Caspi
-### April 5, 2020 (updated: 2020-04-05)
+### April 5, 2020 (updated: 2020-04-06)
 
 ---
 
@@ -210,7 +210,7 @@ Yweb[1,]
 
 ```
 ## log_spend 
-##  5.752573
+##   6.57647
 ```
 
 
@@ -219,8 +219,10 @@ Xweb[1, 1:4]
 ```
 
 ```
-## installshield.com  yieldmanager.com      custhelp.com     compfused.com 
-##          0.000000          1.137197          0.000000          0.000000
+## americansingles.com             opm.gov    netzerovoice.com 
+##                   0                   0                   0 
+##  mobilesidewalk.com 
+##                   0
 ```
 
 __NOTE:__ The design matrix `Xweb` is sparse.
@@ -260,38 +262,38 @@ fit_lm %&gt;%
 &lt;tbody&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 5.95 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.23 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 25.63 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; hsn.com &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.06 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.26 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.03 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; qvc.com &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; expedia.com &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.16 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.66 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; yahoo.net &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; nordstrom.com &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2.03 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.58 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.52 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gator.com &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; jcpenney.com &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.94 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.27 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.48 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; connextra.com &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -2.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -319,7 +321,7 @@ fit_lm %&gt;%
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 1.801 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.989 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -342,13 +344,12 @@ name: linear
 
 # Estimation
 
-_Penalized_ (or _regularized_) sum of squares minimizes
+_Penalized_ (or _regularized_) sum of squares minimizes solves
 
 `$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }R(\beta) \leq t$$`
 where `\(R(\cdot)\)` is a penalty function that measures __expressiveness__ of the model.
 
 As the number of features grow, linear models become _more_ expressive. 
-
 
 
 ---
@@ -371,7 +372,7 @@ Suppose `\(\boldsymbol{\beta}\)` is a `\(k\times 1\)` vector with typical elemen
 It is often convenient to rewrite the regularization problem in the Lagrangian form:
 
 `$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda R(\beta)$$`
-where 
+__NOTE:__ There is one-to-one correspondence between `\(\lambda\)` and `\(t\)`.
 
 |  Method          |  `\(R(\boldsymbol{\beta})\)`             | 
 |:-----------------|:-------------------------------------|
@@ -500,8 +501,6 @@ Ridge regression was introduced into the statistics literature by Hoerl and Kenn
 `$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \lVert\boldsymbol{\beta}\rVert_2^2$$`
 or in a budget constraint form:
 `$$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }\lVert\boldsymbol{\beta}\rVert_2^2 \leq t$$`
-
-__NOTE:__ There is one-to-one correspondence between `\(\lambda\)` and `\(t\)`.
 
 Ridge puts a "budget constraint" on the sum of squared betas. This constraint incorporate the cost of being "too far away" from the null hypothesis of `\(\beta_j=0\)` (what if this assumption is wrong null?)
 
@@ -716,17 +715,10 @@ colnames(Xweb)[coef(cv_lasso, s = "lambda.min")@i]
 ```
 
 ```
-##  [1] "microsoft.com"         "tv.com"               
-##  [3] "relevantknowledge.com" "hsn.com"              
-##  [5] "authnow.com"           "continental.com"      
-##  [7] "symantec.com"          "rsc01.net"            
-##  [9] "nordstrom.com"         "tmcs.net"             
-## [11] "sun.com"               "jcpenney.com"         
-## [13] "usairways.com"         "passport.net"         
-## [15] "65.115.67.11"          "officedepot.com"      
-## [17] "ups.com"               "questionmarket.com"   
-## [19] "travelocity.com"       "expedia.com"          
-## [21] "hp.com"                "revresda.com"
+##  [1] "oldnavy.com"       "connextra.com"     "smartbargains.com"
+##  [4] "webratsmusic.com"  "checkm8.com"       "qvc.com"          
+##  [7] "travelocity.com"   "yahoo.net"         "windows.com"      
+## [10] "staples-deals.com" "msn.com"           "evite.com"
 ```
 
 Using `s = lamda.1se`:
@@ -736,8 +728,7 @@ colnames(Xweb)[coef(cv_lasso, s = "lambda.1se")@i]
 ```
 
 ```
-## [1] "hsn.com"         "nordstrom.com"   "officedepot.com" "expedia.com"    
-## [5] "revresda.com"
+## character(0)
 ```
 
 

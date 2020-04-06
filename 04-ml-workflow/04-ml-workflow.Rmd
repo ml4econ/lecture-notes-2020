@@ -355,12 +355,6 @@ Let's find the top-3 performing models
 
 <midd-blockquote> _"[I]n reality there is rarely if ever a true underlying model, and even if there was a true underlying model, selecting that model will not necessarily give the best forecasts..."_ .right[&mdash; [__Rob J. Hyndman__](https://robjhyndman.com/hyndsight/crossvalidation/)] </midd-blockquote>
 
-```{r best_lambda}
-best_lambda <- boston_results %>% 
-  select_best(metric = "rmse", maximize = FALSE)
-
-best_lambda
-```
 
 ---
 # And Now Using a Graph
@@ -388,6 +382,14 @@ name: eval
 ---
 
 # Use the Test Set to Evaluate the Best Model
+
+Select the optimal $\lambda$
+```{r best_lambda}
+best_lambda <- boston_results %>% 
+  select_best(metric = "rmse", maximize = FALSE)
+
+best_lambda
+```
 
 Prepare a recipe with the optimal $\lambda = 4$
 ```{r prep}
