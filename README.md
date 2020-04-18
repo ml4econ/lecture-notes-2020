@@ -74,7 +74,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 5. [Regression and Regularization](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-regression-regularization/05-regression-regularization.html)  
   5.1 [Prepare browser data](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-regression-regularization/05-prepare-browser-data.html)  
   5.2 [Ridge and lasso simulation](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-regression-regularization/05-simulations.html) 
-  5.3 [Ridge, lasso, PCR and PLS: A Tidymodels Workflow](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-regression-regularization/05-tidymodels-workflow.html) 
+  5.3 [Ridge, lasso, PCR and PLS: A Tidymodels Workflow](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-regression-regularization/05-tidymodels-workflow.html)  
 
 6. [Classification]()
 
