@@ -64,7 +64,11 @@ sitenames <- sitenames_raw %>%
 web <- web_raw %>% 
   mutate(
     id = as_factor(id),
-    site_name = factor(site, levels = 1:length(sitenames), labels = sitenames)
+    site_name = factor(
+      site,
+      levels = 1:length(sitenames),
+      labels = sitenames
+    )
   ) %>% 
   group_by(id) %>% 
   mutate(visitpercent = 100 * visits / sum(visits)) %>% 
@@ -73,7 +77,10 @@ web <- web_raw %>%
 
 ```{r log_spend}
 spend <- spend_raw %>% 
-  mutate(log_spend = log(spend))
+  mutate(
+    log_spend = log(spend),
+    id = as_factor(id)
+  )
 ```
 
 ```{r web_to_wide}
@@ -89,8 +96,8 @@ web_wide <- web %>%
 
 random sample of size 1000 obs X 250 features
 ```{r sample}
-vars_idx <- sample(1:1000, 250)
-obs_idx  <- sample(1:10000, 1000)
+vars_idx <- sample(1:1000, 200)
+obs_idx  <- sample(1:10000, 1200)
 ```
 
 generate response and feature matrices
@@ -98,26 +105,31 @@ generate response and feature matrices
 Xweb <- web_wide %>% 
   select(-id) %>%
   select(vars_idx) %>% 
-  slice(obs_idx) %>%
-  as.matrix()
+  slice(obs_idx)
 
 Yweb <- spend %>% 
   select(log_spend) %>%
-  slice(obs_idx) %>% 
-  as.matrix()
+  slice(obs_idx)
+
+browser_sample <- bind_cols(Yweb, Xweb)
+
+browser <- spend %>% 
+  left_join(web_wide) %>% 
+  select(-id, -spend)
 ```
 
 # Save processed data
 
 ```{r save}
-save(
-  Xweb,
-  file = here("05-regression-regularization/data","Xweb.Rdata")
-)
-
-save(
-  Yweb,
-  file = here("05-regression-regularization/data","Yweb.Rdata")
-)
+write.csv(
+  browser,
+  file = here("05-regression-regularization/data","browser-all.csv"),
+  row.names = FALSE
+  )
+write.csv(
+  browser_sample,
+  file = here("05-regression-regularization/data","browser-sample.csv"),
+  row.names = FALSE
+  )
 ```
 

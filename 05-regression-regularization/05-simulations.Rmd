@@ -27,7 +27,8 @@ knitr::opts_chunk$set(eval = TRUE,
 if (!require("pacman")) install.packages("pacman")
 
 pacman::p_load(
-  glmnet,  # for estimation
+  glmnet,  # for estimating ridge and lasso
+  leaps,   # for best subset selection
   MASS     # for simulating multivariate normal
 )
 ```
@@ -120,4 +121,57 @@ plot(cv_lasso, xvar = "lambda", label = TRUE)
 
 cv_ridge <- cv.glmnet(X_dep, Y_dep, alpha = 0)
 plot(cv_ridge, xvar = "lambda", label = TRUE)
+```
+
+
+
+
+# Thresholding
+
+Simulate data
+```{r}
+y      <- seq(-0.5, 0.5, 0.1)
+n      <- length(y)
+X      <- diag(n)
+lambda <- 0.1
+```
+
+OLS
+```{r}
+ols   <- lm(y ~ X - 1)
+b_ols <- coef(ols)
+```
+
+Ridge
+```{r}
+ridge   <- glmnet(X, y, alpha = 0, standardize = TRUE, intercept = FALSE)
+b_ridge <- coef(ridge, s = lambda)[2:(n+1),1]
+```
+
+Lasso
+```{r}
+lasso   <- glmnet(X, y, alpha = 1, standardize = TRUE, intercept = FALSE)
+b_lasso <- coef(lasso, s = lambda)[2:(n+1),1]
+```
+
+Plot results
+```{r}
+bs <- cbind(b_ols,b_lasso,b_ridge) %>%
+  as_tibble() 
+
+bs %>% 
+  ggplot(aes(x = b_ols)) +
+  geom_line(aes(y = b_ols,   color = "ols")) +
+  geom_line(aes(y = b_lasso, color = "lasso")) +
+  geom_line(aes(y = b_ridge, color = "ridge")) +
+  labs(
+    x = expression(beta^{OLS}),
+    y = "coefficient estimate"
+  )
+```
+
+Best subset selection
+```{r}
+subset <- regsubsets(x = X, y = y, intercept = FALSE, nvmax = 10)
+summary(subset)
 ```

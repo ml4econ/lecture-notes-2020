@@ -38,7 +38,7 @@ htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 
 # Packages and setup
 
-Use the [pacman](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package that automatically loads and installs packages:
+Use the [{`pacman`}](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package that automatically loads and installs packages if necessary:
 
 ```{r pacman, message=FALSE, warning=FALSE, eval=TRUE}
 if (!require("pacman")) install.packages("pacman")
@@ -49,7 +49,10 @@ pacman::p_load(
   broom,       # for tidying estimation output
   here,        # for referencing folders and files
   glmnet,      # for estimating lasso and ridge
-  gamlr        # for forward stepwise selection
+  gamlr,       # for forward stepwise selection
+  pls,         # for estimating PCR and PLS
+  elasticnet,  # for estimating PCR and PLS
+  ggfortify
 )
 ```
 
@@ -58,7 +61,7 @@ Set a theme for `ggplot` (Relevant only for the presentation)
 theme_set(theme_grey(20))
 ```
 
-And set a seed
+And set a seed for replication
 ```{r}
 set.seed(1203)
 ```
@@ -87,14 +90,14 @@ knitr::include_graphics("figs/sparsebooks3.png")
 # Outline
 
  - [Linear regression](#linear)  
+ 
+ - [Penalized regression](#penalized)
 
  - [Subset selection](#subset)  
 
  - [Shrinkage](#shrink)  
 
  - [Dimension Reduction](#dim)  
-
- - [Hands-on](#hands)  
 
 
 ---
@@ -207,20 +210,31 @@ where $visits_i$ is a vector site-visit percentage. This model can be used to se
 In this lecture we will only use a sample from the browser dataset: 250 websites and 1000 users.
 
 ```{r}
-load(here("05-regression-regularization/data","Xweb.Rdata")) # log spend_i
-load(here("05-regression-regularization/data","Yweb.Rdata")) # visits_i
+browser <- here("05-regression-regularization/data","browser-all.csv") %>% 
+  read_csv()
 ```
 
 Log spending by the first user and the fraction of times she spent on the first 4 websites:
 ```{r}
-Yweb[1,]
+browser[6, 1:5]
 ```
+
+__NOTE:__ The design matrix in this case is sparse.
+
+
+---
+
+# Data to matrices
+
+It will be useful to 
 
 ```{r}
-Xweb[1, 1:4]
-```
+browser_mat <- browser %>% 
+  as.matrix()
 
-__NOTE:__ The design matrix `Xweb` is sparse.
+Y_browser <- browser_mat[, 1]     # response
+X_browser <- browser_mat[, 2:201] # features
+```
 
 
 ---
@@ -229,18 +243,18 @@ __NOTE:__ The design matrix `Xweb` is sparse.
 
 Estimate the model using `lm()`
 ```{r}
-fit_lm <- lm(Yweb ~ Xweb)
+lm_fit <- lm(log_spend ~ ., data = browser)
 ```
 
 Show estimation output, sorted by $p$-values
 ```{r}
-fit_lm %>% 
+lm_fit %>% 
   tidy() %>% 
   arrange(p.value) %>% 
-  mutate(term = map_chr(term, ~ str_remove(., "Xweb"))) %>% 
-  head(5) %>% 
+  head(3) %>% 
   kable(format = "html", digits = 2)
 ```
+
 
 ---
 
@@ -249,10 +263,9 @@ fit_lm %>%
 What is the training-set MSE<sup>1</sup>?
 
 ```{r}
-fit_lm %>% 
-  glance() %>% 
-  mutate(MSE = deviance / 1000) %>% 
-  select(MSE) %>% 
+lm_fit %>% 
+  augment() %>%
+  summarise(mse = mean((log_spend - .fitted)^2)) %>% 
   kable(format = "html", digits = 3)
 ```
 
@@ -266,7 +279,7 @@ This is clearly an _underestimate_ of the test set MSE.
 
 ---
 class: title-slide-section-blue, center, middle
-name: linear
+name: penalized
 
 # Penalized linear regression
 
@@ -387,10 +400,10 @@ This is our first example of a __greedy algorithm__: a making the locally optima
 # Stepwise using `gamlr`
 
 .pull-left[
-[`gamlr`](https://github.com/TaddyLab/gamlr) is an R package that enables you, among other things, to estimate a forward stepwise regression model.
+[`{gamlr}`](https://github.com/TaddyLab/gamlr) is an R package that enables you, among other things, to estimate a forward stepwise regression model.
 
 ```{r step, fig.show='hide'}
-fit_step <- gamlr(Xweb, Yweb, gamma=Inf, lmr=.1)
+fit_step <- gamlr(X_browser, Y_browser, gamma=Inf, lmr=.1)
 plot(fit_step, df=FALSE, select=FALSE)
 ```
 The figure on the right shows the value of the coefficients along the forward stepwise selection path. 
@@ -457,10 +470,6 @@ Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/
 
 ]
 
----
-
-<blockquote class="twitter-tweet" data-lang="he"><p lang="en" dir="ltr">Illustration of the Lasso and its path in 2D: for t small enough, the solution is sparse! <a href="https://t.co/0JV23e32DF">pic.twitter.com/0JV23e32DF</a></p>&mdash; Pierre Ablin (@PierreAblin) <a href="https://twitter.com/PierreAblin/status/1107625298936451073?ref_src=twsrc%5Etfw">March 18 2019</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ---
 
@@ -497,32 +506,25 @@ $$\widehat{\boldsymbol{\beta}}_{\text {posterior}}=\left(\mathbf{X}^{\prime} \ma
 # Estimating ridge using `glmnet`
 
 .pull-left[
-The R package `glmnet` enables you to estimate ridge regression, along with its path for $\lambda$.
+The [`{glmnet}`](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html) R package enables you to estimate ridge regression, along with its path for $\lambda$. 
 
-To do so, we need to maker sure to set `alpha = 0`.
+(Note that for estimating the ridge, we need to set `alpha = 0`.)
 ```{r ridge, fig.show='hide'}
-fit_ridge <- glmnet(x = Xweb, y = Yweb, alpha = 0)
+fit_ridge <- glmnet(
+  x = X_browser,
+  y = Y_browser,
+  alpha = 0
+)
 plot(fit_ridge, xvar = "lambda")
 ```
 The figure on the right shows the ridge __regularization path__, i.e., the values of the (standardized) coefficients for different values of (log) $\lambda$.
+
 ]
 .pull-right[
 ```{r, ref.label = 'ridge', echo=FALSE}
 
 ```
 ]
-
----
-
-# How to choose $\lambda$?
-
-$K$-fold cross validation algorithm:
-
-1. Given a training set of $n$ observations, randomly split the data into $K$ roughly evenly sized folds (subsamples).
-
-2. For $k=1, \ldots, K$
-  2.1 Fit the coefficients $\bar{\beta}$ using all but the $k$ th fold of data.
-  2.2 Record MSE on the left-out $k^{\text{th}}$ fold.
 
 ---
 
@@ -534,7 +536,7 @@ The function `cv.glmnet()` automates cross validation for the ridge regression.
 Note that you can change the default number of folds (10) by setting `nfolds` argument.
 
 ```{r cv_ridge, fig.show='hide'}
-cv_ridge <- cv.glmnet(x = Xweb, y = Yweb, alpha = 0)
+cv_ridge <- cv.glmnet(x = X_browser, y = Y_browser, alpha = 0)
 plot(cv_ridge)
 ```
 
@@ -548,7 +550,7 @@ plot(cv_ridge)
 ```
 ]
 
----
+
 
 # Pros and cons of ridge
 
@@ -600,6 +602,11 @@ Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/
 
 ---
 
+<blockquote class="twitter-tweet" data-lang="he"><p lang="en" dir="ltr">Illustration of the Lasso and its path in 2D: for t small enough, the solution is sparse! <a href="https://t.co/0JV23e32DF">pic.twitter.com/0JV23e32DF</a></p>&mdash; Pierre Ablin (@PierreAblin) <a href="https://twitter.com/PierreAblin/status/1107625298936451073?ref_src=twsrc%5Etfw">March 18 2019</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+---
+
 # Bayesian interpretation of lasso
 
 The prior distribution of $\beta$ under lasso is the double exponential (Laplace) with density $1/2\tau \exp (-|\beta| / \tau)$, where $\tau=1/\lambda$. The posterior mode is equal to the lasso solution
@@ -620,7 +627,11 @@ Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/
 The `glmnet()` function with `alpha = 1` (the default) estimates the entire lasso regularization path.
 
 ```{r lasso, fig.show='hide'}
-fit_lasso <- glmnet(x = Xweb, y = Yweb, alpha = 1)
+fit_lasso <- glmnet(
+  x = X_browser,
+  y = Y_browser,
+  alpha = 1
+)
 plot(fit_lasso, xvar = "lambda")
 ```
 ]
@@ -637,7 +648,7 @@ plot(fit_lasso, xvar = "lambda")
 
 .pull-left[
 ```{r cv_lasso, fig.show='hide'}
-cv_lasso <- cv.glmnet(x = Xweb, y = Yweb, alpha = 1)
+cv_lasso <- cv.glmnet(x = X_browser, y = Y_browser, alpha = 1, nfolds = 10)
 plot(cv_lasso, xvar = "lambda")
 ```
 ]
@@ -651,85 +662,53 @@ plot(cv_lasso, xvar = "lambda")
 
 # Which features were selected?
 
+.pull-left[
 Using `s = lambda.min`:
 ```{r}
-colnames(Xweb)[coef(cv_lasso, s = "lambda.min")@i]
+coef(cv_lasso, s = "lambda.min") %>%
+  tidy() %>%
+  as_tibble() %>% 
+  head(10)
 ```
-
+]
+.pull-right[
 Using `s = lamda.1se`:
 ```{r}
-colnames(Xweb)[coef(cv_lasso, s = "lambda.1se")@i]
+coef(cv_lasso, s = "lambda.1se") %>%
+  tidy() %>%
+  as_tibble() %>% 
+  head(10)
 ```
-
+]
 
 
 ---
 # A note about shrinkage
 
-Assume that $n=p$ and $\mathbf{X}$ is an $n\times p$ diagonal matrix with 1's on its diagonal.
+Assume that $n=p$ and $\mathbf{X}$ is an $n\times p$ orthonormal matrix with unit vectors and that we are estimating a regression without an intercept.
 
-OLS finds $\beta_1,\ldots,\beta_p$ that minimize
+Under these assumptions, OLS finds $\beta_1,\ldots,\beta_p$ that minimize $\sum_{j=1}^{p}\left(y_{j}-\beta_{j}\right)^{2}$. The solution is $\hat{\beta}^{\text{OLS}}_{j}=y_{j}$ (that is, a perfect fit, $R^2=1$.)
 
-$$\sum_{j=1}^{p}\left(y_{j}-\beta_{j}\right)^{2}$$
-
-The solution $\hat{\beta}^{\text{OLS}}_{j}=y_{j}$ (that is, perfect fit, $R^2=1$.)
-
-In this setting, the ridge regression estimates take the form
+Similarly, ridge and lasso estimates take the form
 $$\hat{\beta}_{j}^{Ridge}=\frac{\hat{\beta}^{\text{OLS}}}{(1+\lambda)},\qquad\qquad \hat{\beta}_{j}^{Lasso}=\left\{\begin{array}{ll}
 \hat{\beta}^{\text{OLS}}-\lambda / 2 & \text { if } \hat{\beta}^{\text{OLS}}>\lambda / 2 \\
 \hat{\beta}^{\text{OLS}}+\lambda / 2 & \text { if } \hat{\beta}^{\text{OLS}}<-\lambda / 2 \\
 0 & \text { if }\left|\hat{\beta}^{\text{OLS}}\right| \leq \lambda / 2
 \end{array}\right.$$
+and best-subset selection drops all variables with coefficients smaller than the $t^\text{th}$ largest.
 
 ---
 
-# Two types of shrinkage
+# Shrinkage and its consequences for econometric analysis
 
 Ridge shrinks proportionally, whereas lasso shrinks by a similar amount, and sufficiently small coefficients are shrunken all the way to zero. The lasso type of shrinkage is called "soft-thresholding."
 
 ```{r, echo=FALSE, out.width = "65%", fig.align='center'}
-
 knitr::include_graphics("figs/soft.png")
-
 ```
 Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/index.html) 
 
-__Main takeaway:__ We can't just use ridge/lasso coefficients for statistical inference (unless you're a Bayesian...)
-
-
----
-
-```{r, echo=FALSE, out.width = "70%", fig.align='center'}
-knitr::include_graphics("figs/housing1.png")
-```
-
----
-
-```{r, echo=FALSE, out.width = "70%", fig.align='center'}
-knitr::include_graphics("figs/housing2.png")
-```
-
----
-
-```{r, echo=FALSE, out.width = "70%", fig.align='center'}
-knitr::include_graphics("figs/housing3.png")
-```
-
----
-
-```{r, echo=FALSE, out.width = "70%", fig.align='center'}
-knitr::include_graphics("figs/housing4.png")
-```
-
-
----
-
-# Shortcomings of linear models and what comes next
-
-- Linear models can be very flexible but need lots of work (and memory and computing power) when it comes to explicitly adding polynomials, interactions, etc.
-
-- Out next set of models, trees, random forests, are better equipped for these tasks, but come with a cost when it comes to interpretability.
-
+__Main takeaway:__ We can't just use ridge/lasso coefficients in subsequent econometric analysis (unless you're a Bayesian...)
 
 ---
 class: title-slide-section-blue, center, middle
@@ -739,8 +718,402 @@ name: dim
 
 ---
 
-# Next time
+# A different approach
 
+__MAIN IDEA:__ Instead of selecting and/or shrinking $\boldsymbol{\beta}$, try to find $M$ linear combinations of the $x$'s, such that $M<p$ and use them to predict $y$.
+
+---
+
+# Motivating example
+
+Consider the following regression model:
+
+$$y_i = \beta_1 x_{i1} + \beta_2 x_{i2} + \varepsilon_i$$
+
+next, define a new variable, $f_i$, as a linear combination of $x_{i1}, x_{i2}$:
+
+$$f_{i} = \lambda_{1} x_{i1} + \lambda_{2} x_{i2}$$
+for some constants $\lambda_1$ and $\lambda_2$. This "factor" is a lower dimension representation of the feature space (one variable instead of two.)
+
+According to the dimension reduction approach, it might be the case that
+
+$$\hat{y}_i = \hat\alpha{f}_{i}$$
+(estimated by, say, OLS) would provide better predictions.
+
+---
+
+# How does this relate to penalized regression?
+
+Since
+
+$$\hat{y}_i = \hat{\alpha} f_i = \hat{\alpha}\lambda_{1}x_{i1} + \hat{\alpha}\lambda_{2}x_{i2},$$
+dimension reduction can be viewed as a method that puts a constraint on the estimated $\beta$'s, i.e., 
+
+$$y_i = \beta^{*}_1 x_{i1} + \beta_2^* x_{i2} + \varepsilon_i$$
+where
+$$\beta^{*}_1 = \alpha\lambda_{1}\qquad\text{and}\qquad \beta^*_2 = \alpha\lambda_2$$
+
+The main challenges here:
+1. How to choose (estimate) $\lambda_1$, $\lambda_2$?  
+2. How many factors to use? (in this case, since $p=2$, $M$ is at most 2.)
+
+---
+
+# The general case
+
+- Let $f_1, f_2, \ldots, f_p$ represent $p$ linear combinations of the features $x_1, x_2, \ldots,x_p$, such that 
+
+$$f_{im} = \lambda_{m1} x_{1i} + \ldots + \lambda_{mp} x_{ip},\qquad \text{for } m = 1,\ldots,p$$
+- The linear model is given by
+$$y_i = \alpha_0 + \sum_{m=1}^{M}\alpha_m f_{im} + \varepsilon_i,\qquad \text{for } i = 1,\ldots,N$$
+where $M<p$, and is estimated by OLS.
+
+- The main issue is estimating and selecting the number of factors in a way that improves prediction accuracy (i.e., reduce variance with respect to OLS.)
+
+---
+# Principal components regression (PCR)
+
+Let $\mathbf{x}=(x_1,\ldots,x_p)$ and $\boldsymbol{\lambda}_1=(\lambda_{k1},\ldots,\lambda_{kp})$ denote a vector of features and scalars, respectively. Principal component analysis (PCA) amounts to:
+
+(1) Find a linear combinations $\boldsymbol{\lambda}_1$ of the elements of $\mathbf{x}$ that maximizes its variance.
+
+(2) Next, find a linear combination $\boldsymbol{\lambda}_2$ of the elements of $\mathbf{x}$, uncorrelated with $\boldsymbol{\lambda_1}^{\prime}\mathbf{x}$ having maximum variance.
+$$\vdots$$
+$(p)$ Finally, find a linear combination $\boldsymbol{\lambda}_p$ of the elements of $\mathbf{x}$, uncorrelated with $\boldsymbol{\lambda_1}^{\prime}\mathbf{x},\ldots,\boldsymbol{\lambda_{p-11}}^{\prime}\mathbf{x}$ having maximum variance.
+
+<midd-blockquote> $\boldsymbol{\lambda_k}^{\prime}\mathbf{x}$ is the $k^{\text{th}}$ __principal component__ (PC), and $\boldsymbol{\lambda_k}$ is the vector of coefficients or __loadings__ for the $k^{\text{th}}$ PC.
+ </midd-blockqoute>
+
+---
+# Illustration in 2-D
+
+```{r kaggle, echo=FALSE, out.width = "100%", fig.align='center'}
+
+knitr::include_graphics("figs/pca.gif")
+
+```
+
+[Source](https://stats.stackexchange.com/questions/134282/relationship-between-svd-and-pca-how-to-use-svd-to-perform-pca)
+
+---
+
+# Illustration: NBC TV pilots data
+
+- To illustrate, we will use Matt Taddy's NBC pilots dataset that include survey responses for focus groups on TV show pilots as well as the first year of ratings results.
+
+- Our objective: predict viewer interest from pilot surveys, thus helping the studios to make better programming decisions.
+
+- The survey data include 6241 views and 20 questions for 40 shows.
+
+- `PE` is our outcome of interest. It measures viewers engagement with the show which is reported on a 0 (no attention) to 100 (fully engaged) scale.
+
+---
+# Read `shows` dataset
+
+`shows` includes data on 40 TV shows.
+```{r}
+shows <- here("05-regression-regularization/data", "nbc_showdetails.csv") %>% 
+  read_csv()
+
+head(shows)
+```
+
+---
+# Read `survey` results dataset
+
+The `survey` dataset includes 6241 views and 20 questions for 40 shows.
+```{r}
+survey <- here("05-regression-regularization/data", "nbc_pilotsurvey.csv") %>% 
+  read_csv()
+
+head(survey)
+```
+
+---
+# Aggregate survey data
+
+We now aggregate viewer answers by show (we will use `mean` an the aggregating function)
+```{r}
+survey_mean <- survey %>% 
+  select(-Viewer) %>% 
+  group_by(Show) %>% 
+  summarise_all(list(mean)) 
+
+head(survey_mean)
+```
+
+---
+# Join `shows` and `survey` to a single tibble
+
+We now generate a tibble that holds `PE` and the mean survey answers, as well as `Genre` and `Show`.
+```{r}
+df_join <- shows %>% 
+  left_join(survey_mean) %>% 
+  select(PE, starts_with("Q"), Genre, Show)
+
+head(df_join)
+```
+
+---
+# Set up the data for PCR
+
+Features matrix (mean survey answers):
+```{r}
+X <- df_join %>% 
+  select(starts_with("Q")) %>% 
+  as.matrix()
+```
+
+Principal components based on `X` (scaled):
+```{r}
+PC <- X %>% 
+  prcomp(scale. = TRUE) %>% 
+  predict()   #<<
+```
+where we've used the `prcomp()` and `predict()` function to extract the PCs. Setting `scale.=TRUE` makes sure that `X` is scaled prior to running PCA.
+
+Response variable (`PE`):
+```{r}
+Y <- df_join %>% 
+  select(PE) %>% 
+  as.matrix()
+```
+
+---
+# Run PCR using the `pls` package
+
+.pull-left[
+There are a bunch of packages that perform PCR however, I find that the [`{pls}`](https://cran.r-project.org/web/packages/pls/index.html) package is perhaps the most convenient choice (other than using `{tidymodels}`.)
+```{r pcr, fig.show='hide'}
+cv_pcr <- pcr(
+  Y ~ X,
+  scale = TRUE,
+  validation = "CV",
+  segments = 10       
+)
+validationplot(cv_pcr)
+```
+]
+.pull-right[
+```{r, ref.label = 'pcr', echo=FALSE}
+
+```
+]
+
+---
+# Wait, But what is the meaning of these "components"?
+
+.pull-left[
+Examining the loadings matrix (also known as "rotation matrix") can help us to put label on PCs.
+
+First, we will apply the `prcomp()` function again the the feature matrix and store its output in `pca`.
+```{r}
+pca <- X %>% prcomp(scale. = TRUE)
+```
+Then, we can access the rotation matrix using the `$rotation` handle (we'll only look at the first two components.)
+```{r, eval=FALSE}
+pca$rotation[, 1:2] %>% round(1)
+```
+
+]
+.pull-right[
+```{r, echo=FALSE}
+pca$rotation[, 1:2] %>% round(1)
+```
+]
+
+---
+# Explained Variance (scree plot)
+
+.pull-left[
+And here is the cumulative variance explained by each PC ("scree plot")
+```{r scree, fig.show='hide', eval=FALSE}
+pca %>% 
+  tidy("pcs") %>% 
+  ggplot(aes(PC, percent)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    y = "percent of explaind variance",
+    x = "principal component number"
+  )
+```
+]
+.pull-right[
+```{r, ref.label = 'scree', echo=FALSE}
+
+```
+]
+
+---
+# Plot data with PCs on axis
+
+.pull-left[
+The following code plots the survey data based on the first two principal components
+```{r pca, fig.show='hide'}
+pca %>% 
+  autoplot(
+    data = df_join,
+    colour = "Genre",
+    size = 3
+  ) +
+  theme(legend.position = "top")
+```
+]
+.pull-right[
+```{r, ref.label = 'pca', echo=FALSE}
+
+```
+]
+
+---
+# Notes about PCR, ridge, and lasso
+
+
+- PCR is an unsupervised method. PCs are extracted without using $y$. (Can we first extract PCs and _then_ proceed to cross validation? Why?)
+
+- PCR implicitly assumes that that data are _dense_, as opposed to lasso where the data is assumed to be _sparse_.
+
+- (Very wonkish:) Ridge regression can also be interpreted as an algorithm that shrinks PCs of $x$ having small variance. By contrast, PCR leaves $M$ PCs untouched and removes the rest.<sup>*</sup> 
+
+
+.footnote[
+[*] For further details, see Hastie et al. (2009), Section 3.4.1.
+]
+
+---
+
+# Sparse PCA (SPCA)
+
+Sparse principal component analysis (Zou, Hastie, and, Tibshirani, 2006) employ lasso type penalties to produce components with many loadings zero. 
+
+SPCA can be estimated using the `spca()` function from the [`{elasticnet}`](https://cran.r-project.org/web/packages/elasticnet/index.html) package
+```{r}
+spc <- spca(
+  x = X,
+  K = 2,
+  type = "predictor",
+  sparse = "varnum",
+  para = c(10, 10)
+)
+```
+where `type="predictor"` means that the input is a feature matrix (and not, say, a covariance matrix), and where the number of PCs `K` is limited to the first two.
+
+Sparsness on the loadings is imposed by `sparse=varnum` which means that we want to limit the number of non-zero loading parameters and `para = c(4,4)` means that we want that each component will have 4 non-zero loadings.
+
+---
+# SPCA results
+
+.pull-left[
+Here are the loadings of the first two sparse PCs based on the `spca()` algorithm:  
+```{r, eval=FALSE}
+spc$loadings %>% round(1)
+```
+We can now proceeds to PCR by tuning `K` and or `para` using cross-validation (not in this lecture.)
+]
+.pull-right[
+```{r, echo=FALSE}
+spc$loadings %>% round(1)
+```
+]
+
+---
+# PCR-lasso
+
+Taddy (2019) suggests that instead of tuning the number of principal components, we could try to tune their number using lasso: 
+$$\underset{\alpha_{0}, \alpha}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\alpha_{0}-\sum_{j=1}^{p} 
+\hat{f}_{i j} \alpha_{j}\right)^{2}+\lambda \lVert\boldsymbol{\alpha}\rVert_1$$
+
+
+---
+# Tune each method using cross-validation
+
+We will now compare 3 methods:
+
+1. PCR-lasso for $y$ on $f$.
+2. Lasso for $y$ on $x$.
+3. PCR-lasso for $y$ onto both $x$ and $f$.
+
+```{r}
+lasso_pcr  <- cv.glmnet(x = PC, y = Y, nfold = 20)
+lasso_x    <- cv.glmnet(x = X , y = Y, nfold = 20)
+lasso_pcrx <- cv.glmnet(x = cbind(X, PC) , y = Y, nfold = 20)
+```
+
+(Which of the above is preferred depends on the application.)
+
+---
+# Plot cross-validation results
+
+```{r, fig.height=2.5}
+par(mfrow=c(1,3))
+plot(lasso_pcr, sub = "PCR")  
+plot(lasso_x, sub = "Lasso")  
+plot(lasso_pcrx, sub = "PCR-LAsso")
+```
+
+---
+# Partial least squares (PLS)
+
+- In PCR, PCs are extracted in an unsupervised way - we don't use information on $y$ during the process.
+
+- by contrast, partial least squares (PLS) extracts factors in a supervised way.
+
+- In theory, PLS should have an advantage over PCR, it might pick-up features that are highly correlated with $y$ that PCR would drop.
+
+- In practice, when it comes to prediction, there is little difference in most applications.
+
+
+---
+# PLS algorithm
+
+For 
+
+(1) Regress $y$ onto each $x_j$
+$$y_i = \phi_{kj} x_{i,j} + \varepsilon_{ij},\qquad \text{for }j=1,\ldots,p$$
+each time storing $\phi_{kj}$.
+
+(2) Use the estimated vector $\hat{\boldsymbol{\phi}}=(\phi_{k1},\ldots,\phi_{kp})$ to construct a new factor $v_{ik}$, which is a linear combination of the $x$s:
+$$v_{ik}=\hat{\boldsymbol{\phi}_k}^{\prime}\mathbf{x}_i$$
+(3) Define the residuals from (1) as a new set of features, and proceed to (2).
+
+(4) Continue until you reach the minimum of $p$ or $n$.
+
+---
+# Run PLS using the `pls` package
+
+.pull-left[
+We're no ready to estimate PLS using, wait for it..., the [`{pls}`](https://cran.r-project.org/web/packages/pls/index.html) package!
+```{r plsr, fig.show='hide'}
+cv_pls <- plsr(
+  Y ~ X,
+  scale = TRUE,
+  validation = "CV",
+  segments = 10       
+)
+validationplot(cv_pls)
+```
+]
+.pull-right[
+```{r, ref.label = 'plsr', echo=FALSE}
+
+```
+]
+
+---
+# Summary
+
+- _"Despite its simplicity, the linear model has distinct advantages in terms of its interpretability and often shows good predictive performance."_ (Hastie and Tibshirani)
+
+- Subset selection is slow, unstable, and infeasible when $p$ is large.
+
+- Ridge provides is fast, works when $p>n$, provides good predictions, but is hard to interpret (keeps all features in.)
+
+- Lasso is fast, works when $p>n$, provides good predictions, and performs variable selection.
+
+- Ridge and lasso shrink the parameters of the model, thus, can't be used out-of-the-box for econometric analysis
+
+- Despite their advantages, linear models need lots of bookkeeping (and memory and computing power) when it comes to explicitly adding non-linearities, interactions, etc. 
 
 ---
 class: .title-slide-final, center, inverse, middle
@@ -755,6 +1128,10 @@ class: .title-slide-final, center, inverse, middle
 
 Hoerl, A. E., and Kennard, R. W. 1970. Ridge regression: Biased estimation for nonorthogonal problems. _Technometrics_, 12(1), 55-67.
 
+Jolliffe, I. T. (2010). _Principal Component Analysis_. Springer.
+
 Taddy, M. 2019. _Business Data Science: Combining Machine Learning and Economics to Optimize, Automate, and Accelerate Business Decisions_ . McGraw-Hill Education. Kindle Edition. 
 
 Tibshirani, R. 1996. Regression shrinkage and selection via the lasso. _J . Roy. Statist. Soc. B_, 58(1), 267-288.
+
+Zou, H., Hastie, T., & Tibshirani, R. (2006). Sparse principal component analysis. _Journal of computational and graphical statistic_s, 15(2), 265-286.
