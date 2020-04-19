@@ -226,8 +226,7 @@ __NOTE:__ The design matrix in this case is sparse.
 
 # Data to matrices
 
-It will be useful to 
-
+We will soon see that it is useful to transform the data to response and features vector and matrix, respectively:
 ```{r}
 browser_mat <- browser %>% 
   as.matrix()
@@ -239,7 +238,7 @@ X_browser <- browser_mat[, 2:201] # features
 
 ---
 
-# Results
+# OLS results
 
 Estimate the model using `lm()`
 ```{r}
@@ -260,7 +259,7 @@ lm_fit %>%
 
 # Model perfoemance
 
-What is the training-set MSE<sup>1</sup>?
+What is the training-set MSE?
 
 ```{r}
 lm_fit %>% 
@@ -270,11 +269,6 @@ lm_fit %>%
 ```
 
 This is clearly an _underestimate_ of the test set MSE.
-
-
-.footnote[
-[1] In the case of a linear regression model, deviance is defined as the sum of squares.
-]
 
 
 ---
@@ -287,12 +281,12 @@ name: penalized
 
 # Estimation
 
-_Penalized_ (or _regularized_) sum of squares minimizes solves
+_Penalized_ (or _regularized_) sum of squares solves
 
 $$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }R(\beta) \leq t$$
-where $R(\cdot)$ is a penalty function that measures __expressiveness__ of the model.
+where $R(\cdot)$ is a penalty function that measures the __expressiveness__ of the model.
 
-As the number of features grow, linear models become _more_ expressive. 
+As the number of features grows, linear models become _more_ expressive. 
 
 
 ---
@@ -300,13 +294,13 @@ As the number of features grow, linear models become _more_ expressive.
 # Notation: Norms
 
 
-Suppose $\boldsymbol{\beta}$ is a $k\times 1$ vector with typical element $\beta_i$. 
+Suppose $\boldsymbol{\beta}$ is a $p\times 1$ vector with typical element $\beta_i$. 
 
-- The $\ell_0$-norm is defined as $||\boldsymbol{\beta}||_0=\sum_{j=1}^{k}\boldsymbol{1}_{\{\beta_j\neq0\}}$, i.e., the number of non-zero elements in $\boldsymbol{\beta}$.  
+- The $\ell_0$-norm is defined as $||\boldsymbol{\beta}||_0=\sum_{j=1}^{p}\boldsymbol{1}_{\{\beta_j\neq0\}}$, i.e., the number of non-zero elements in $\boldsymbol{\beta}$.  
 
-- The $\ell_1$-norm is defined as $||\boldsymbol{\beta}||_1=\sum_{j=1}^{k}|\beta_j|$.  
+- The $\ell_1$-norm is defined as $||\boldsymbol{\beta}||_1=\sum_{j=1}^{p}|\beta_j|$.  
 
-- The $\ell_2$-norm is defined as $||\boldsymbol{\beta}||_2=\left(\sum_{j=1}^{k}|\beta_j|^2\right)^{\frac{1}{2}}$, i.e., Euclidean norm.  
+- The $\ell_2$-norm is defined as $||\boldsymbol{\beta}||_2=\left(\sum_{j=1}^{p}|\beta_j|^2\right)^{\frac{1}{2}}$, i.e., Euclidean norm.  
 
 
 ---
@@ -323,11 +317,11 @@ __NOTE:__ There is one-to-one correspondence between $\lambda$ and $t$.
 | Subset selection | $\lVert\boldsymbol{\beta}\rVert_0$   |
 | Lasso            | $\lVert\boldsymbol{\beta}\rVert_1$   |
 | Ridge            | $\lVert\boldsymbol{\beta}\rVert_2^2$ |
-| Elastic Net<sup>1</sup>      | $\alpha\lVert\boldsymbol{\beta}\rVert_1 + (1-\alpha)\lVert\boldsymbol{\beta}\rVert_2^2$             |
+| Elastic Net<sup>*</sup>      | $\alpha\lVert\boldsymbol{\beta}\rVert_1 + (1-\alpha)\lVert\boldsymbol{\beta}\rVert_2^2$             |
 
 
 .footnote[
-[1] Will not be covered in this lecture. Essentially, a fancy name for combining ridge and lasso.
+[*] Will not be covered in this lecture. Essentially, a fancy name for combining ridge and lasso.
 ]
 
 
@@ -441,12 +435,14 @@ __NOTE:__ This is not important when using OLS (why?)
 
 # The ridge regression
 
-Ridge regression was introduced into the statistics literature by Hoerl and Kennard (1970).The optimization problem:
+Ridge regression was introduced into the statistics literature by Hoerl and Kennard (1970). 
+
+The optimization problem:
 $$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2}+\lambda \lVert\boldsymbol{\beta}\rVert_2^2$$
 or in a budget constraint form:
 $$\underset{\beta_{0}, \beta}{\operatorname{min}} \sum_{i=1}^{N}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p} x_{i j} \beta_{j}\right)^{2} \text { subject to }\lVert\boldsymbol{\beta}\rVert_2^2 \leq t$$
 
-Ridge puts a "budget constraint" on the sum of squared betas. This constraint incorporate the cost of being "too far away" from the null hypothesis of $\beta_j=0$ (what if this assumption is wrong null?)
+Ridge puts a "budget constraint" on the sum of squared betas. This constraint incorporate the cost of being "too far away" from the null hypothesis of $\beta_j=0$ (what if this assumption is wrong?)
 
 ---
 
@@ -480,7 +476,7 @@ The problem in matrix notation:
 $$\underset{\boldsymbol{\beta}}{\operatorname{min}}\:\:(\mathbf{y}-\mathbf{X} \boldsymbol{\beta})^{\prime}(\mathbf{y}-\mathbf{X} \boldsymbol{\beta})+\lambda \boldsymbol{\beta}^{\prime} \boldsymbol{\beta}$$
 The ridge estimator is given by
 $$\widehat{\boldsymbol{\beta}}^{\text {R}}=\left(\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}\right)^{-1} \mathbf{X}^{\prime} \mathbf{y}$$
-__NOTE:__ We can have a solution even if $\mathrm{X}$ is not of full rank (e.g., due to multicollinearity) since $\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}$ is non-singular.
+__NOTE:__ We can have a solution even if $\mathrm{X}$ is not of full rank (e.g., due to multicollinearity) since $\mathbf{X}^{\prime} \mathbf{X}+\lambda \mathbf{I}$ is non-singular (since $\lambda>0$.)
 
 
 ---
@@ -508,7 +504,7 @@ $$\widehat{\boldsymbol{\beta}}_{\text {posterior}}=\left(\mathbf{X}^{\prime} \ma
 .pull-left[
 The [`{glmnet}`](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html) R package enables you to estimate ridge regression, along with its path for $\lambda$. 
 
-(Note that for estimating the ridge, we need to set `alpha = 0`.)
+(Note that for estimating the ridge, we need to set `alpha`, the elastic net parameter to 0.)
 ```{r ridge, fig.show='hide'}
 fit_ridge <- glmnet(
   x = X_browser,
@@ -533,7 +529,7 @@ The figure on the right shows the ridge __regularization path__, i.e., the value
 .pull-left[
 The function `cv.glmnet()` automates cross validation for the ridge regression. 
 
-Note that you can change the default number of folds (10) by setting `nfolds` argument.
+Note that you can change the default number of folds (10) by setting the `nfolds` argument.
 
 ```{r cv_ridge, fig.show='hide'}
 cv_ridge <- cv.glmnet(x = X_browser, y = Y_browser, alpha = 0)
@@ -576,7 +572,7 @@ Lasso puts a "budget constraint" on the sum of _absolute_ $\beta$'s.
 
 Unlike ridge, the lasso penalty is linear (moving from 1 to 2 is the same as moving from 101 to 102.)
 
-A great advantage of the lasso is that it zeros out most of the $\beta$'s in the model (the solution is _sparse_.)
+A great advantage of the lasso is that performs model selection - it zeros out most of the $\beta$'s in the model (the solution is _sparse_.)
 
 Any penalty that involves the $\ell_1$ norm will do this.
 
@@ -609,7 +605,7 @@ Source: [James et al. (2017) ](http://faculty.marshall.usc.edu/gareth-james/ISL/
 
 # Bayesian interpretation of lasso
 
-The prior distribution of $\beta$ under lasso is the double exponential (Laplace) with density $1/2\tau \exp (-|\beta| / \tau)$, where $\tau=1/\lambda$. The posterior mode is equal to the lasso solution
+The prior distribution of $\boldsymbol{\beta}$ under lasso is the double exponential (Laplace) with density $1/2\tau \exp (-|\boldsymbol{\beta}| / \tau)$, where $\tau=1/\lambda$. The posterior mode is equal to the lasso solution
 
 On the left, normal prior (ridge). On the right, Laplace prior (lasso):
 
@@ -667,8 +663,7 @@ Using `s = lambda.min`:
 ```{r}
 coef(cv_lasso, s = "lambda.min") %>%
   tidy() %>%
-  as_tibble() %>% 
-  head(10)
+  as_tibble()
 ```
 ]
 .pull-right[
@@ -676,8 +671,7 @@ Using `s = lamda.1se`:
 ```{r}
 coef(cv_lasso, s = "lambda.1se") %>%
   tidy() %>%
-  as_tibble() %>% 
-  head(10)
+  as_tibble()
 ```
 ]
 
@@ -1065,19 +1059,20 @@ plot(lasso_pcrx, sub = "PCR-LAsso")
 
 
 ---
-# PLS algorithm
+# The PLS algorithm
 
 For 
 
-(1) Regress $y$ onto each $x_j$
-$$y_i = \phi_{kj} x_{i,j} + \varepsilon_{ij},\qquad \text{for }j=1,\ldots,p$$
-each time storing $\phi_{kj}$.
+(1) Regress $y$ onto each $x_j$ independently, i.e., 
+$$y_i = \phi_{1j} x_{i,j} + \varepsilon_{ij},\qquad \text{for }j=1,\ldots,p$$
+and store $\phi_{11},\ldots,\phi_{1p}$.
 
-(2) Use the estimated vector $\hat{\boldsymbol{\phi}}=(\phi_{k1},\ldots,\phi_{kp})$ to construct a new factor $v_{ik}$, which is a linear combination of the $x$s:
-$$v_{ik}=\hat{\boldsymbol{\phi}_k}^{\prime}\mathbf{x}_i$$
-(3) Define the residuals from (1) as a new set of features, and proceed to (2).
+(2) Use the estimated vector of coefficients $\hat{\boldsymbol{\phi}_1}=(\phi_{11},\ldots,\phi_{1p})$ to construct a new component $v_{i1}$, which is a linear combination of the $x$s:
+$$v_{i1}=\hat{\boldsymbol{\phi}_1}^{\prime}\mathbf{x}_i$$
+(3) Define the residuals from (1) as a new set of features, and proceed to (2) and estimate the second component, $v_{i2}=\hat{\boldsymbol{\phi}_2}^{\prime}\mathbf{x}_i$.
 
 (4) Continue until you reach the minimum of $p$ or $n$.
+
 
 ---
 # Run PLS using the `pls` package
