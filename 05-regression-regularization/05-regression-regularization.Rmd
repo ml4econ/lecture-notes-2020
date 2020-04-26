@@ -489,7 +489,7 @@ where we assume that $\sigma$ is known.
 
 - Suppose we put an independent prior on each $\beta_{j}$
 
-$$\beta_{j} \sim \mathcal{N}\left(0, \tau^{2}\right)$$
+$$\beta_{j} \sim {N}\left(0, \tau^{2}\right)$$
 
 - Then, the posterior mean for $\boldsymbol{\beta}$ is 
 
@@ -1115,7 +1115,7 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides::end()`
 
-[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/04-mk-workflow)  
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/05-regression-regularization)  
 
 ---
 

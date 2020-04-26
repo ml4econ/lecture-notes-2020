@@ -35,7 +35,7 @@ set.seed(1203)
 
 # Read data
 ```{r}
-browser <- here("05-regression-regularization/data","browser-all.csv") %>% 
+browser <- here("05-regression-regularization/data","browser-sample.csv") %>% 
   read_csv()
 ```
 
