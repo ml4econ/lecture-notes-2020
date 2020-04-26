@@ -40,7 +40,6 @@ vignettes/*.pdf
 
 # lecture notes folders
 
-06-classification/*.*
 07-nonparametrics/*.*
 08-unsupervised-learning/*.*
 09-text-analysis/*.*
