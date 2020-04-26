@@ -520,7 +520,7 @@ As we've seen, classifying everyone as "negative" $(p^*=1)$, fails to be specifi
 __Sensitivity:__ The fraction of positive examples that are
 classified as positive ("true positive rate"), $98,586/98,586 = 100\%$ in example.
 
-__Specificity:__ The fraction of negative examples (`Yes`) that are
+__Specificity:__ The fraction of negative examples yhat are
 classified as negative ("true negative rate"), $0/8,956 = 0\%$ in example.
 
 
@@ -549,7 +549,7 @@ covid_conf_mat%>%
   filter(.metric %in% c("accuracy", "sens", "spec")) %>% 
   mutate("1-.estimate" = 1 - .estimate)
 ```
-As we can see, for `class_rule = 0.8`, the model is highly sensitive but not so sensitive. Clearly, changing the rule would change the model's classification properties.
+As we can see, for `class_rule = 0.8`, the model is highly sensitive but not so specific. Clearly, changing the rule would change the model's classification properties.
 ]
 
 
