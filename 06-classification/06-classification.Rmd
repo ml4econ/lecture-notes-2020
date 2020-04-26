@@ -436,7 +436,7 @@ logit_model <- glm(
 
 Alternatively, we can estimate the regularized version of the model using `glmnet` with `family = "binomial"`:
 ```{r, eval=FALSE}
-reg_logit_fit <- cv.glmnet(x, y, family = "binomial")
+logit_model <- cv.glmnet(x, y, family = "binomial")
 ```
 
 __SPOILER ALERT:__ `cv.glmnet` selects all features.
@@ -620,7 +620,7 @@ When it comes to classification tasks, it is sometimes more reasonable to tune t
 
 For example, we can use the `cv.glmnet()` function while setting the `type.measure = "auc"` in order to tune based on auc values
 ```{r, eval=FALSE}
-cvfit <- cv.glmnet(
+logit_model <- cv.glmnet(
   x, y, 
   family = "binomial",
   type.measure = "auc"  #<<

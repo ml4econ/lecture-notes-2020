@@ -45,7 +45,7 @@ covid_raw <-
 
 # Initial preprocessing
 
-Replace all `NULL` with `NA`
+Replace all `NULL` values with `NA`'s
 ```{r}
 is.na(covid_raw[,-1]) <- covid_raw[,-1] == "NULL"
 ```
