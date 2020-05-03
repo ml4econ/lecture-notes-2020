@@ -49,7 +49,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 | [**2**](#week-2)      | Basic ML Concepts                          |
 | [**3**](#week-3)      | Regression and Regularization              |
 | [**4**](#week-4)      | Classification                             |
-| [**5**](#week-5)      | Non-parametrics                            |
+| [**5**](#week-5)      | Trees and Forests                          |
 | [**6**](#week-6)      | Unsupervised Learning                      | 
 | [**7**](#week-7)      | Text analysis                              |
 | [**8**](#week-7)      | Causal Inference                           |
