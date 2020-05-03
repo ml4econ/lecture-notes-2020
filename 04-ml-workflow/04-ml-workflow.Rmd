@@ -120,7 +120,7 @@ Source: [https://www.bostonusa.com/](https://www.bostonusa.com/)
 ---
 # Load the Data
 
-Laos the data
+Load the data
 ```{r load_data, message = TRUE}
 boston_raw <- read_csv(here("04-ml-workflow/data","BostonHousing.csv"))
 ```

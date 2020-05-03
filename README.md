@@ -79,7 +79,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 6. [Classification](https://raw.githack.com/ml4econ/lecture-notes-2020/master/06-classification/06-classification.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/06-classification/06-classification.pdf)  
   6.1[Classification: A Tidymodels workflow](https://raw.githack.com/ml4econ/lecture-notes-2020/master/06-classification/06-tidymodels-workflow-covid.html)
 
-7. [Nonparametrics]()
+7. [Trees and Forests](https://raw.githack.com/ml4econ/lecture-notes-2020/master/05-trees-forests/07-trees-forests.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/07-trees-forests/07-trees-forests.pdf) 
 
 8. [Unsupervised Learning]()
 

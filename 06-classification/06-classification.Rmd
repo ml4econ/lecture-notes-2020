@@ -634,7 +634,13 @@ class: title-slide-section-blue, center, middle
 name: mult
 
 # Multiclass Classification
-## (Next time)
+
+
+---
+# Multinomial regression model
+
+
+
 
 
 
