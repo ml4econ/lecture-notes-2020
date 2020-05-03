@@ -66,7 +66,7 @@ theme_set(theme_grey(20))
 
 And set a seed for replication
 ```{r}
-set.seed(1505)
+set.seed(1203)
 ```
 
 
