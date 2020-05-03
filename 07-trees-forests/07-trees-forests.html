@@ -35,6 +35,7 @@ if (!require("pacman")) install.packages("pacman")
 
 pacman::p_load(
   tidyverse,   # for data wrangling and visualization
+  broom,       # for tidy model output
   rpart,       # for estimating CART
   rpart.plot,  # for plotting rpart objects
   ranger,      # for estimating random forests
@@ -56,13 +57,14 @@ theme_set(theme_grey(20))
 And set a seed for replication
 
 ```r
-set.seed(1203)
+set.seed(1505)
 ```
 
 
 ---
 # Outline
 
+ - [Stratification](#strat) 
  
  - [Regression Trees](#reg)
  
@@ -84,9 +86,9 @@ set.seed(1203)
 
 ---
 class: title-slide-section-blue, center, middle
-name: reg
+name: strat
 
-# Regression Trees
+# Stratification
 
 ---
 # Boston housing (again)
@@ -219,9 +221,9 @@ The answers to the these questions are related to the decision trees framework.
 
 ---
 class: title-slide-section-blue, center, middle
-name: tree
+name: reg
 
-# Descision Trees
+# Regression Trees
 
 ---
 # Classification and regression trees (CART)
@@ -844,8 +846,8 @@ rf_fit
 ## Target node size:                 5 
 ## Variable importance mode:         impurity 
 ## Splitrule:                        variance 
-## OOB prediction error (MSE):       10.38274 
-## R squared (OOB):                  0.8772533
+## OOB prediction error (MSE):       10.27935 
+## R squared (OOB):                  0.8784756
 ```
 
 ---
