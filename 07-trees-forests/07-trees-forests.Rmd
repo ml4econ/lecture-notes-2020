@@ -72,7 +72,6 @@ set.seed(1203)
 ---
 # Outline
 
- - [Stratification](#strat)
  
  - [Regression Trees](#reg)
  
@@ -85,20 +84,18 @@ set.seed(1203)
 
  
 ---
-class: title-slide-section-blue, center, middle
-name: strat
-
-# Stratification
-
-
-
----
 # Types of desicion tree applications
 
 - Decision trees can be applied to both regression and classification tasks.
 
 - We first consider regression problems using the Boston dataset, and then move on to classification using the Titanic dataset.
 
+
+---
+class: title-slide-section-blue, center, middle
+name: reg
+
+# Regression Trees
 
 ---
 # Boston housing (again)
@@ -546,7 +543,7 @@ knitr::include_graphics("https://en.wikipedia.org/wiki/File:RMS_Titanic_3.jpg")
 We'll replicate the results in Varian (2014) "Big data: New tricks for econometrics":
 ```{r}
 titanic_raw <- 
-  here("07-nonparametrics/data", "titanic_varian.csv") %>% 
+  here("07-trees-forests/data", "titanic_varian.csv") %>% 
   read_csv()
 ```
 
@@ -800,8 +797,15 @@ According to our forest, both `lstat` and `rm` outperform the other features.
 ```
 ]
 
+
 ---
-# Other ensemble methods
+class: title-slide-section-blue, center, middle
+name: ensemble
+
+# Other Ensemble Methods
+
+---
+# Bagging and Boosting
 
 - Bagging (Bootstrap Aggregating): same as random forest, only $m=p$. Inferior to random forests since trees are correlated.
 
@@ -817,8 +821,6 @@ class: .title-slide-final, center, inverse, middle
 # `slides::end()`
 
 [<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/07-nonparametrics)  
-
-
 
 ---
 # References
