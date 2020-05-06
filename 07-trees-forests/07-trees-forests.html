@@ -48,15 +48,10 @@ pacman::p_load(
 library(parttree)
 ```
 
-Set a theme for `ggplot` (Relevant only for the presentation)
+Set a theme for `ggplot` (Relevant only for the presentation), and set a seed for replication
 
 ```r
 theme_set(theme_grey(20))
-```
-
-And set a seed for replication
-
-```r
 set.seed(1203)
 ```
 
@@ -133,7 +128,7 @@ boston %&gt;%
 ```
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-2-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-1-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -153,7 +148,7 @@ Note that the prediction is given by the average of `\(medv_i\)` within each "re
 
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-3-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-2-1..svg)&lt;!-- --&gt;
 ]
 
 
@@ -184,7 +179,7 @@ boston %&gt;%
 Again, the prediction is given by the average of `\(medv_i\)` within each "region".
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-4-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-3-1..svg)&lt;!-- --&gt;
 ]
 ---
 # Four-way split
@@ -204,7 +199,7 @@ boston %&gt;%
 - The more splits we have, the better the fit. (What about prediction?)
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-5-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-4-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -342,7 +337,7 @@ rpart.plot(tree_fit, cex = 2)
 
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-7-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-6-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -363,7 +358,7 @@ Setting `\(cp=0\)` results in a saturated tree.
 Note we've set the minimum split criterion to `\(80\)` just to avoid clutter (too many splits) in the figure on the right.
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-8-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-7-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -398,7 +393,7 @@ tree_fit &lt;- rpart(
 `\(cp=0.029\)` is the 1se optimal `\(cp\)`.
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-9-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-8-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -418,7 +413,7 @@ rpart.plot(tree_prune, cex = 2)
 ```
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-11-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-10-1..svg)&lt;!-- --&gt;
 ]
 
 
@@ -436,7 +431,7 @@ boston %&gt;%
 ```
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-12-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-11-1..svg)&lt;!-- --&gt;
 ]
 
 
@@ -457,7 +452,7 @@ rpart.plot(tree_fit, cex = 2)
 For now, we will ignore the `cp = 0.15` argument.
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-13-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-12-1..svg)&lt;!-- --&gt;
 ]
 
 
@@ -488,7 +483,7 @@ vip(tree_all_vars)
 `rm` (the number of rooms) is clearly the most important feature in predicting `medv`.
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-15-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-14-1..svg)&lt;!-- --&gt;
 ]
 
 
@@ -502,7 +497,7 @@ name: class
 ---
 # Adjustment to classification tasks: Splits
 
-- Instead of `\(SSR\)`, splits are typically based on the _Gini index_ (a.k.a _node purity_), defined by
+- Instead of `\(RSS\)`, splits are typically based on the _Gini index_ (a.k.a _node purity_), defined by
 `$$G=\sum_{k=1}^{K} \hat{p}_{m k}\left(1-\hat{p}_{m k}\right),$$`
 a measure of total variance across the total classes (this is `rpart`'s default.)
 
@@ -526,7 +521,7 @@ a measure of total variance across the total classes (this is `rpart`'s default.
 _"The RMS Titanic was a British passenger liner that sank in the North Atlantic Ocean in the early morning hours of 15 April 1912, after it collided with an iceberg during its maiden voyage from Southampton to New York City. There were an estimated 2,224 passengers and crew aboard the ship, and more than 1,500 died, making it one of the deadliest commercial peacetime maritime disasters in modern history."_ .right[&amp;mdash; [Wikipedia](https://en.wikipedia.org/wiki/RMS_Titanic)]
 ]
 .pull-right[
-&lt;img src="https://en.wikipedia.org/wiki/File:RMS_Titanic_3.jpg" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/RMS_Titanic_3.jpg" width="80%" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -624,7 +619,7 @@ titanic %&gt;%
 ```
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-19-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-18-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -651,7 +646,7 @@ rpart.plot(rpart_prune, type=0, extra=1, cex = 2)
 ```
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-22-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-21-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -670,7 +665,7 @@ titanic %&gt;%
 where I've used the `geom_parttree()` function from the [`{parttree}`](https://github.com/grantmcdermott/parttree) package (in development.)
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-23-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-22-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -726,7 +721,7 @@ lm(survived ~ . -1, data = titanic_lm) %&gt;%
 ```
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-26-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-25-1..svg)&lt;!-- --&gt;
 ]
 
 
@@ -863,7 +858,7 @@ rf_fit %&gt;%
 According to our forest, both `lstat` and `rm` outperform the other features.
 ]
 .pull-right[
-![](07-trees-forests_files/figure-html/unnamed-chunk-29-1..svg)&lt;!-- --&gt;
+![](07-trees-forests_files/figure-html/unnamed-chunk-28-1..svg)&lt;!-- --&gt;
 ]
 
 

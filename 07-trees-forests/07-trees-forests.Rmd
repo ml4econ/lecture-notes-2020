@@ -59,13 +59,9 @@ pacman::p_load(
 library(parttree)
 ```
 
-Set a theme for `ggplot` (Relevant only for the presentation)
+Set a theme for `ggplot` (Relevant only for the presentation), and set a seed for replication
 ```{r ggplot_theme}
 theme_set(theme_grey(20))
-```
-
-And set a seed for replication
-```{r}
 set.seed(1203)
 ```
 
@@ -510,7 +506,7 @@ name: class
 ---
 # Adjustment to classification tasks: Splits
 
-- Instead of $SSR$, splits are typically based on the _Gini index_ (a.k.a _node purity_), defined by
+- Instead of $RSS$, splits are typically based on the _Gini index_ (a.k.a _node purity_), defined by
 $$G=\sum_{k=1}^{K} \hat{p}_{m k}\left(1-\hat{p}_{m k}\right),$$
 a measure of total variance across the total classes (this is `rpart`'s default.)
 
@@ -535,7 +531,7 @@ _"The RMS Titanic was a British passenger liner that sank in the North Atlantic 
 ]
 .pull-right[
 ```{r titanic_img, echo=FALSE, out.width = "80%", fig.align='center'}
-knitr::include_graphics("https://en.wikipedia.org/wiki/File:RMS_Titanic_3.jpg")
+knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/f/fd/RMS_Titanic_3.jpg")
 ```
 ]
 

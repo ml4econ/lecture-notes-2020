@@ -40,6 +40,13 @@ vignettes/*.pdf
 
 # lecture notes folders
 
-07-nonparametrics/*.*
-08-unsupervised-learning/*.*
-09-text-analysis/*.*
+08*/
+09*/
+10*/
+11*/
+12*/
+13*/
+14*/
+
+
+
