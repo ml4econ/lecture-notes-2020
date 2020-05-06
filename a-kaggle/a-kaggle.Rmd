@@ -129,15 +129,17 @@ knitr::include_graphics("figs/tracking.png")
 ---
 # Getting started
 
-Running the following code chunk will automatically download the data you need for our Kaggle competition and create a new R project and open it in a new RStudio session:
+Running the following code chunk will automatically download the data (train, test, and a sample submission file) you'll need for our Kaggle competition:
 
 ```{r remedy001, eval = FALSE}
 
-install.packages("usethis")
-library(usethis)
+library(tidyverse)
 
-use_course("https://github.com/ml4econ/course-spring2019/blob/master/kaggle/kaggle.zip?raw=true")
+train <- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2020/master/a-kaggle/data/train.csv")
 
+test <- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2020/master/a-kaggle/data/test.csv")
+
+sample_submission <- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2020/master/a-kaggle/data/sample_submission.csv")
 
 ```
 

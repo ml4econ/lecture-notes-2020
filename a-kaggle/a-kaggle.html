@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 # Midterm Assignment
 ## Kaggle Prediction Competition
 ### Itamar Caspi
-### April 14, 2019 (updated: 2019-04-15)
+### May 10, 2019 (updated: 2020-05-06)
 
 ---
 
@@ -48,7 +48,7 @@ class: center, middle, inverse, title-slide
 .pull-left[
 1. Visit [www.kaggle.com](www.kaggle.com) and sing-up.  
 
-2. Go to the ml4econ course competition webpage: [https://www.kaggle.com/c/55750-machine-learning-for-economists-huji-2019/data](https://www.kaggle.com/c/55750-machine-learning-for-economists-huji-2019/data).  
+2. Go to the ml4econ course competition [webpage](https://www.kaggle.com/t/e8bfb2b153284eaab2f131296f7d949b). 
 
 3. Review competition details: objectives, deadline, data, evaluation, submission rules, etc. 
 ]
@@ -61,11 +61,11 @@ class: center, middle, inverse, title-slide
 # Kaggle competition data structure
 
 .pull-left[
-- MSE for the public test immediately available at submission.  
+- MSE for the public test set (30%) immediately available at submission.  
 
-- MSE for the private test available only once the competition closes.  
+- MSE for the private test set (70%) available only once the competition closes.  
 
-- The split between public and private test sets is arbitrary and unknown in advance.  
+- The split between public and private test sets is arbitrary and unknown in advance to all competitors.  
 
 
 Your final ranking is based on how well you perform on the *private* test set.
@@ -82,8 +82,9 @@ Your final ranking is based on how well you perform on the *private* test set.
 
 2. Explore the data.  
 
-3. Preprocessing (standardization, dummies, interactions, etc.).  
-4. Choose a model class (Lasso, trees, NN, etc.).  
+3. Preprocessing (standardization, dummies, interactions, etc.).
+
+4. Choose a model class (asso, ridge, trees, etc.).  
 
 5. Tune complexity (Cross validation).  
 
@@ -112,17 +113,21 @@ Your final ranking is based on how well you perform on the *private* test set.
 ---
 # Getting started
 
-Running the following code chunk will automatically download the data you need for our kaggle competition and create a new R project and open it in a new RStudio session:
+Running the following code chunk will automatically download the data (train, test, and a sample submission file) you'll need for our Kaggle competition:
 
 
 ```r
-# install.packages("usethis")
-library(usethis)
+library(tidyverse)
 
-use_course("https://github.com/ml4econ/course-spring2019/blob/master/kaggle/kaggle.zip?raw=true")
+train &lt;- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2020/master/a-kaggle/data/train.csv")
+
+test &lt;- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2020/master/a-kaggle/data/test.csv")
+
+sample_submission &lt;- read.csv("https://raw.githubusercontent.com/ml4econ/lecture-notes-2020/master/a-kaggle/data/sample_submission.csv")
 ```
 
-__NOTE:__ By default, the new project will be created on your desktop.
+__NOTE:__ By default, a new project will be created on your desktop.
+
 ---
 class: .title-slide-final, center, inverse, middle
 
@@ -177,7 +182,24 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     deleted = true;
   });
-})();</script>
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
 
 <script>
 (function() {
