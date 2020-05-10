@@ -765,24 +765,22 @@ name: mult
 
 - Each observation belongs to one of `\(K\)` Classes
 
-`$$G = 1,\ldots,K$$`
-
 - Outcome variable
 `$$y = (y_{1},\ldots,y_{K})$$` 
-where `\(y_{k}=1\)` if the outcome belongs to the `\(k^{th}\)` class, and zero otherwise. 
+where `\(y_{k}=1\)` if the outcome belongs to the `\(k^{\text{th}}\)` class, and zero otherwise. 
 
 - Conditional probability
 `$$p_{k}\equiv\operatorname{Pr}\left(y_{k}=1 | \mathbf{x}_{}\right)$$`
-In words: the `\(p_{ik}\)` is the probability that `\(y_i\)` belongs to class `\(k\)`, given `\(\mathbf{x}_i\)`.
+In words: the `\(p_{k}\)` is the probability that `\(y\)` belongs to class `\(k\)`, given `\(\mathbf{x}_i\)`.
 
 ---
 # Multinomial regression model
 
-For each class `\(k=1,\ldots,K\)`, we model the response as
+For each class `\(k=1,\ldots,K\)`, we model the outcome as
 `$$p_{k}=\frac{\exp({\mathbf{x}^{\prime} \boldsymbol{\beta}_{j}})}{\sum_{k=1}^{K} \exp({\mathbf{x}^{\prime} \beta_{k}})}$$`
 where there are `\(K\)` coefficients for each variable (one per class).
 
-_NOTE:_ There is no explicit base class here since regularized solutions are not equivariant under base changes, and regularization automatically eliminates the redundancy
+__NOTE:__ There is no explicit base class here since regularized solutions are not equivariant under base changes, and regularization automatically eliminates the redundancy
 
 ---
 # Likelihood and deviance
@@ -795,9 +793,9 @@ Taking logs and multiplying by -2 yields the multinomial deviance
 ---
 # Regularization
 
-We can also minimized the deviance subject to a standard lasso type ( `\(\ell_1\)` norm) penalty on `\(\beta\)`:
+Similar to the binomial case, we can minimized the deviance subject to a standard lasso type ( `\(\ell_1\)` norm) penalty on `\(\beta\)`:
 
-`$$\min _{\left(\beta_{0}, \beta\right) \in \mathbb{R}^{p+1}} \left\{-\frac{2}{N} \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log p_{i k}+\lambda \sum_{i=1}^N \sum_{k=1}^K \left|\beta_{k j}\right|\right\}$$`
+`$$\min _{\left(\beta_{0}, \beta\right) \in \mathbb{R}^{p+1}} \left\{-\frac{2}{N} \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log p_{i k}+\lambda \sum_{i=1}^p \sum_{k=1}^K \left|\beta_{k j}\right|\right\}$$`
 where `\(p_{ik} = \Lambda(\mathbf{x}_i^{\prime}\beta_{k})\)`,
 
 
