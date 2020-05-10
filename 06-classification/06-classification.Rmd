@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,
   message = FALSE,
-  cache = FALSE,
+  cache = TRUE,
   dev = "svglite",
   fig.ext = ".svg")
 
@@ -75,7 +75,7 @@ set.seed(1203)
  
  - [Sensitivity Specificity Trade-off](#sens)
  
- - [Multiclass classification (next time)](#mult)
+ - [Multiclass classification](#mult)
  
  
 
@@ -313,7 +313,7 @@ However, an OLS regression of $y_{i}$ on $\mathbf{x}_{i}$ ignores the discretene
 
 A more appropriate model is the __logit model__ or __logistic regression model__ specifies as
 
-$$p_i=\Lambda(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta})=\frac{\exp \left(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta}\right)}{1+\exp \left(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta}\right)}$$
+$$p=\Lambda(\mathbf{x}^{\prime} \boldsymbol{\beta})=\frac{\exp \left(\mathbf{x}^{\prime} \boldsymbol{\beta}\right)}{1+\exp \left(\mathbf{x}^{\prime} \boldsymbol{\beta}\right)}$$
 where $\Lambda(\cdot)$ is the logistic cdf. As such, the model imposes the restriction that $0 \leq p_i \leq 1$.
 
 
@@ -321,9 +321,9 @@ where $\Lambda(\cdot)$ is the logistic cdf. As such, the model imposes the restr
 # Odds-ratio
 
 Note that
-$$\frac{p_i}{1-p_i}=\exp \left(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta}\right)$$
+$$\frac{p}{1-p}=\exp \left(\mathbf{x}^{\prime} \boldsymbol{\beta}\right)$$
 Taking logs yields
-$$\ln\left(\frac{p_i}{1-p_i}\right) = \mathbf{x}_{i}^{\prime} \boldsymbol{\beta}$$
+$$\ln\left(\frac{p}{1-p}\right) = \mathbf{x}^{\prime} \boldsymbol{\beta}$$
 The above is useful representation of the logistic regression model. The LHS is called the log __odds ratio__ (or relative risk.)
 
 Hence, we can say that the logistic regression model is linear in log odds-ratio.
@@ -452,6 +452,20 @@ logit_model %>% tidy()
 ```{r}
 logit_model %>% glance()
 ```
+
+
+---
+# Generate predictions
+
+The `augment()` function (also from `{broom}`) augments the original dataframe with the fitted values (and standard errors)
+```{r}
+covid_pred <- 
+  logit_model %>% 
+  augment()
+
+covid_pred
+```
+
 
 ---
 # Model predictions (in sample)
@@ -637,11 +651,253 @@ name: mult
 
 
 ---
+# Multiclass outcomes
+
+- Each observation belongs to one of $K$ Classes
+
+$$G = 1,\ldots,K$$
+
+- Outcome variable
+$$y = (y_{1},\ldots,y_{K})$$ 
+where $y_{k}=1$ if the outcome belongs to the $k^{th}$ class, and zero otherwise. 
+
+- Conditional probability
+$$p_{k}\equiv\operatorname{Pr}\left(y_{k}=1 | \mathbf{x}_{}\right)$$
+In words: the $p_{ik}$ is the probability that $y_i$ belongs to class $k$, given $\mathbf{x}_i$.
+
+---
 # Multinomial regression model
 
+For each class $k=1,\ldots,K$, we model the response as
+$$p_{k}=\frac{\exp({\mathbf{x}^{\prime} \boldsymbol{\beta}_{j}})}{\sum_{k=1}^{K} \exp({\mathbf{x}^{\prime} \beta_{k}})}$$
+where there are $K$ coefficients for each variable (one per class).
+
+_NOTE:_ There is no explicit base class here since regularized solutions are not equivariant under base changes, and regularization automatically eliminates the redundancy
+
+---
+# Likelihood and deviance
+
+The model-based likelihood can be written
+$$\prod_{i=1}^{N} \prod_{k=1}^{K} p_{i k}^{y_{i k}}$$
+Taking logs and multiplying by -2 yields the multinomial deviance
+$$-2 \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log \left(p_{i k}\right)$$
+
+---
+# Regularization
+
+We can also minimized the deviance subject to a standard lasso type ( $\ell_1$ norm) penalty on $\beta$:
+
+$$\min _{\left(\beta_{0}, \beta\right) \in \mathbb{R}^{p+1}} \left\{-\frac{2}{N} \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log p_{i k}+\lambda \sum_{i=1}^N \sum_{k=1}^K \left|\beta_{k j}\right|\right\}$$
+where $p_{ik} = \Lambda(\mathbf{x}_i^{\prime}\beta_{k})$,
 
 
+---
+# Illustration: Forensic glass data
 
+The forensic glass (`fgl`) data frame has 214 rows and 10 columns.
+
+The data include for each of 214 shards of glass, measurements on the refractive index (`RI`) and 8 measurements of chemical composition by weight of oxide (percentage) for elements `Na`, `Mg`, `Al`, `Si`, `K`, `Ca`, `Ba`, and `Fe`.
+
+The fragments were originally classed into seven types:
+
+- `WinF`: window float glass
+- `WinNF`: window non-float glass
+- `Veh`: vehicle window glass
+- `Con`: containers
+- `Tabl`: tableware
+- `Head`: vehicle headlamps
+
+Out objective is to classify new data to one the above six types.
+
+---
+# Load and inspect the `fgl` data
+
+The `fgl` data comes with the `{MASS}` library (which was loaded at the beginning of this lecture.)
+```{r}
+data(fgl) 
+
+fgl_wide <- 
+  fgl %>% 
+  as_tibble()
+```
+
+```{r}
+head(fgl_tbl)
+```
+
+---
+# Tidy the data using `pivot_longer`
+
+The following code chunk transforms the date from wide to long format using the `pivot_longer()` function from the `{tidyr}` package (this will come in handy soon when we plot the data.):
+```{r}
+fgl_long <- 
+  fgl_wide %>% 
+  pivot_longer(-type, names_to = "feature", values_to = "value")
+
+fgl_long
+```
+
+
+---
+# Distribution of (some) feature values by glass type
+
+.pull-left[
+```{r box_fgl, fig.show='hide'}
+fgl_long %>% 
+  filter(feature != "RI") %>%
+  ggplot(aes(x = type, y = value, fill = feature)) +
+  geom_boxplot() +
+  facet_wrap(~ feature, scales = "free") +
+  theme_minimal() +
+  scale_fill_viridis_d() +
+  theme(legend.position = "none")
+```
+Some of the features are clear discriminators, e.g., `Ba` is barely present in all glass types but `Head`.
+]
+.pull-right[
+
+```{r, ref.label = 'box_fgl', echo=FALSE}
+
+```
+
+]
+
+---
+# Preprocess the data (some interactions)
+
+To make the feature set more "interesting" we add interactions with `RI`:
+```{r}
+fgl_interact <- 
+  recipe(type ~ ., data = fgl) %>% 
+  step_interact(~ all_predictors() * RI) %>% 
+  step_zv(all_predictors()) %>% 
+  prep() %>% 
+  juice()
+
+head(fgl_interact)
+```
+
+---
+# Prepare input to `glmnet`
+
+Before we fit the model, we need to transform the data to outcome and feature matrices.
+```{r}
+y <- 
+  fgl_interact %>%
+  pull(type)
+
+x <- 
+  fgl_interact %>%
+  select(-type) %>% 
+  as.matrix()
+```
+Note that `y` is a one-dimensional _factor_.
+
+---
+# Cross-validation using `glmnet`
+
+.pull-left[
+We can estimate the regularized version of the model using `glmnet` with `family = "multinomial"`:
+```{r}
+fit <- cv.glmnet(
+  x = x,
+  y = y,
+  family = "multinomial"
+)
+```
+and plot the cross-validation results using `plot`
+```{r cv_mult, fig.show='hide'}
+plot(fit)
+```
+]
+.pull-right[
+```{r, ref.label = 'cv_mult', echo=FALSE}
+
+```
+]
+
+
+---
+# Multiclass prediction
+
+.pull.left[
+We now extract the predicted class and predicted probabilities pf belonging to each class
+```{r}
+class <- 
+  fit %>% 
+  predict(newx = x, s = "lambda.1se", type = "class")
+
+prob <-
+  fit %>% 
+  predict(newx = x, s = "lambda.1se", type = "response") %>% 
+  as_tibble()
+```
+
+---
+# Maximum probability rule 
+
+We can rearrange `class` and `prob` as a nice `tibble`:
+```{r}
+fgl_pred <- 
+  fgl_wide %>% 
+  select(type) %>%
+  mutate(
+    class = class[,1],
+    class = factor(class, levels = levels(type))
+  ) %>% 
+  bind_cols(prob)
+```
+Predicted class is determined using the _maximum probability rule_.
+```{r}
+fgl_pred %>% sample_n(5)
+```
+
+
+---
+# Multiclass confusion matrix
+
+We can print the multiclass confusion matrix using the `conf_mat()` function (from `{yardstick}`):
+```{r}
+fgl_pred %>% 
+  conf_mat(type, class)
+```
+
+For example, our model correctly classified $54$ observations as `WinF` out of all predicted `WinF` ( $54/80 = 67.5\%$ precision rate.)
+
+On the other hand, the model correctly predicted $54$ `WinF`out of the number of actual `WinF`, $64$, which is $54/64=84.4\%$. 
+
+---
+# Multiclass ROC curve(s)
+
+.pull-left[
+A one-vs-all approach is often taken to calculate multiple ROC curves.
+
+We can plot multiclass ROC curves using the `roc_curve` function (from `{yardstick}`):
+```{r mult_roc, fig.show='hide'}
+fgl_pred %>% 
+  roc_curve(type, WinF.1:Head.1) %>% 
+  autoplot()
+```
+where `WinF.1:Head.1` are the model's fitted probabilities.
+
+See how the model fails to distinguish between `Veh` and the others, whereas classifying as `Tabl` is almost perfect.
+]
+.pull-right[
+```{r, ref.label = 'mult_roc', echo=FALSE}
+
+```
+]
+
+---
+# Multiclass ROC-AUC
+
+[Hand and Till (2001)](https://link.springer.com/article/10.1023/A:1010920819831) extend the definition to the case of more than two classes by averaging pairwise comparisons.
+
+Calculating the multiclass AUC value can be done using the `roc_auc` function from the `{yardstick}` function:
+```{r}
+fgl_pred %>% 
+  roc_auc(type, WinF.1:Head.1)
+```
 
 
 ---
@@ -651,10 +907,11 @@ class: .title-slide-final, center, inverse, middle
 
 [<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/06-classification)  
 
-
-
-
 ---
 # References
 
+Hand, Till (2001). "A Simple Generalisation of the Area Under the ROC Curve for Multiple Class Classification Problems". _Machine Learning_. Vol 45, Iss 2, pp 171-186.
+
 Lantz, Brett. Machine Learning with R: Expert techniques for predictive modeling, 3rd Edition (p. 333). Packt Publishing.
+
+Taddy, Matt. B_usiness Data Science: Combining Machine Learning and Economics to Optimize, Automate, and Accelerate Business Decisions_. McGraw-Hill Education.

@@ -89,6 +89,12 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 TBA
 
+### Projects
+
+1. [Kaggle competition](https://raw.githack.com/ml4econ/lecture-notes-2020/master/a-kaggle/a-kaggle.html)
+
+
+
 ## Problem Sets
 
 Can be found [here](https://github.com/ml4econ/problem-sets-2020).

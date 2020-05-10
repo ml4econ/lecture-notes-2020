@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 # 06 - Classification
 ## ml4econ, HUJI 2020
 ### Itamar Caspi
-### April 26, 2020 (updated: 2020-04-27)
+### April 26, 2020 (updated: 2020-05-10)
 
 ---
 
@@ -67,7 +67,7 @@ set.seed(1203)
  
  - [Sensitivity Specificity Trade-off](#sens)
  
- - [Multiclass classification (next time)](#mult)
+ - [Multiclass classification](#mult)
  
  
 
@@ -145,16 +145,16 @@ covid_raw %&gt;% glimpse()
 ```
 
 ```
-## Observations: 107,542
-## Variables: 8
-## $ cough               &lt;dbl&gt; 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, ...
-## $ fever               &lt;dbl&gt; 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, ...
-## $ sore_throat         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, ...
-## $ shortness_of_breath &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, ...
-## $ head_ache           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
-## $ corona_result       &lt;chr&gt; "negative", "negative", "negative", "positive", "ne...
-## $ age_60_and_above    &lt;chr&gt; "No", "No", "Yes", "Yes", "Yes", "Yes", "No", "No",...
-## $ gender              &lt;chr&gt; "male", "male", "male", "male", "female", "male", "...
+## Rows: 107,542
+## Columns: 8
+## $ cough               &lt;dbl&gt; 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, ...
+## $ fever               &lt;dbl&gt; 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, ...
+## $ sore_throat         &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ shortness_of_breath &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, ...
+## $ head_ache           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
+## $ corona_result       &lt;chr&gt; "negative", "negative", "negative", "positive", "negat...
+## $ age_60_and_above    &lt;chr&gt; "No", "No", "Yes", "Yes", "Yes", "Yes", "No", "No", "N...
+## $ gender              &lt;chr&gt; "male", "male", "male", "male", "female", "male", "mal...
 ```
 
 
@@ -340,7 +340,7 @@ However, an OLS regression of `\(y_{i}\)` on `\(\mathbf{x}_{i}\)` ignores the di
 
 A more appropriate model is the __logit model__ or __logistic regression model__ specifies as
 
-`$$p_i=\Lambda(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta})=\frac{\exp \left(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta}\right)}{1+\exp \left(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta}\right)}$$`
+`$$p=\Lambda(\mathbf{x}^{\prime} \boldsymbol{\beta})=\frac{\exp \left(\mathbf{x}^{\prime} \boldsymbol{\beta}\right)}{1+\exp \left(\mathbf{x}^{\prime} \boldsymbol{\beta}\right)}$$`
 where `\(\Lambda(\cdot)\)` is the logistic cdf. As such, the model imposes the restriction that `\(0 \leq p_i \leq 1\)`.
 
 
@@ -348,9 +348,9 @@ where `\(\Lambda(\cdot)\)` is the logistic cdf. As such, the model imposes the r
 # Odds-ratio
 
 Note that
-`$$\frac{p_i}{1-p_i}=\exp \left(\mathbf{x}_{i}^{\prime} \boldsymbol{\beta}\right)$$`
+`$$\frac{p}{1-p}=\exp \left(\mathbf{x}^{\prime} \boldsymbol{\beta}\right)$$`
 Taking logs yields
-`$$\ln\left(\frac{p_i}{1-p_i}\right) = \mathbf{x}_{i}^{\prime} \boldsymbol{\beta}$$`
+`$$\ln\left(\frac{p}{1-p}\right) = \mathbf{x}^{\prime} \boldsymbol{\beta}$$`
 The above is useful representation of the logistic regression model. The LHS is called the log __odds ratio__ (or relative risk.)
 
 Hence, we can say that the logistic regression model is linear in log odds-ratio.
@@ -503,6 +503,40 @@ logit_model %&gt;% glance()
 ## 1        61666.  107541 -20726. 41468. 41544.   41452.      107534
 ```
 
+
+---
+# Generate predictions
+
+The `augment()` function (also from `{broom}`) augments the original dataframe with the fitted values (and standard errors)
+
+```r
+covid_pred &lt;- 
+  logit_model %&gt;% 
+  augment()
+
+covid_pred
+```
+
+```
+## # A tibble: 107,542 x 15
+##    corona_result cough fever sore_throat shortness_of_br~ head_ache age_60_and_above
+##    &lt;fct&gt;         &lt;fct&gt; &lt;fct&gt; &lt;fct&gt;       &lt;fct&gt;            &lt;fct&gt;     &lt;fct&gt;           
+##  1 negative      1     0     0           0                0         No              
+##  2 negative      1     1     0           0                0         No              
+##  3 negative      0     1     0           0                0         Yes             
+##  4 positive      1     1     0           0                0         Yes             
+##  5 negative      1     0     0           0                0         Yes             
+##  6 positive      1     1     0           0                0         Yes             
+##  7 negative      0     0     0           0                0         No              
+##  8 negative      1     1     1           0                1         No              
+##  9 negative      1     0     1           0                0         No              
+## 10 negative      1     1     1           1                0         No              
+## # ... with 107,532 more rows, and 8 more variables: gender &lt;fct&gt;, .fitted &lt;dbl&gt;,
+## #   .se.fit &lt;dbl&gt;, .resid &lt;dbl&gt;, .hat &lt;dbl&gt;, .sigma &lt;dbl&gt;, .cooksd &lt;dbl&gt;,
+## #   .std.resid &lt;dbl&gt;
+```
+
+
 ---
 # Model predictions (in sample)
 
@@ -523,7 +557,7 @@ covid_pred %&gt;%
 ```
 ]
 .pull-right[
-![](06-classification_files/figure-html/unnamed-chunk-14-1..svg)&lt;!-- --&gt;
+![](06-classification_files/figure-html/unnamed-chunk-15-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -673,7 +707,7 @@ covid_pred %&gt;%
 Note that we've used `.fitted` instead of `.fitted_class`.
 ]
 .pull-right[
-![](06-classification_files/figure-html/unnamed-chunk-20-1..svg)&lt;!-- --&gt;
+![](06-classification_files/figure-html/unnamed-chunk-21-1..svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -727,11 +761,333 @@ name: mult
 
 
 ---
+# Multiclass outcomes
+
+- Each observation belongs to one of `\(K\)` Classes
+
+`$$G = 1,\ldots,K$$`
+
+- Outcome variable
+`$$y = (y_{1},\ldots,y_{K})$$` 
+where `\(y_{k}=1\)` if the outcome belongs to the `\(k^{th}\)` class, and zero otherwise. 
+
+- Conditional probability
+`$$p_{k}\equiv\operatorname{Pr}\left(y_{k}=1 | \mathbf{x}_{}\right)$$`
+In words: the `\(p_{ik}\)` is the probability that `\(y_i\)` belongs to class `\(k\)`, given `\(\mathbf{x}_i\)`.
+
+---
 # Multinomial regression model
 
+For each class `\(k=1,\ldots,K\)`, we model the response as
+`$$p_{k}=\frac{\exp({\mathbf{x}^{\prime} \boldsymbol{\beta}_{j}})}{\sum_{k=1}^{K} \exp({\mathbf{x}^{\prime} \beta_{k}})}$$`
+where there are `\(K\)` coefficients for each variable (one per class).
+
+_NOTE:_ There is no explicit base class here since regularized solutions are not equivariant under base changes, and regularization automatically eliminates the redundancy
+
+---
+# Likelihood and deviance
+
+The model-based likelihood can be written
+`$$\prod_{i=1}^{N} \prod_{k=1}^{K} p_{i k}^{y_{i k}}$$`
+Taking logs and multiplying by -2 yields the multinomial deviance
+`$$-2 \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log \left(p_{i k}\right)$$`
+
+---
+# Regularization
+
+We can also minimized the deviance subject to a standard lasso type ( `\(\ell_1\)` norm) penalty on `\(\beta\)`:
+
+`$$\min _{\left(\beta_{0}, \beta\right) \in \mathbb{R}^{p+1}} \left\{-\frac{2}{N} \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log p_{i k}+\lambda \sum_{i=1}^N \sum_{k=1}^K \left|\beta_{k j}\right|\right\}$$`
+where `\(p_{ik} = \Lambda(\mathbf{x}_i^{\prime}\beta_{k})\)`,
 
 
+---
+# Illustration: Forensic glass data
 
+The forensic glass (`fgl`) data frame has 214 rows and 10 columns.
+
+The data include for each of 214 shards of glass, measurements on the refractive index (`RI`) and 8 measurements of chemical composition by weight of oxide (percentage) for elements `Na`, `Mg`, `Al`, `Si`, `K`, `Ca`, `Ba`, and `Fe`.
+
+The fragments were originally classed into seven types:
+
+- `WinF`: window float glass
+- `WinNF`: window non-float glass
+- `Veh`: vehicle window glass
+- `Con`: containers
+- `Tabl`: tableware
+- `Head`: vehicle headlamps
+
+Out objective is to classify new data to one the above six types.
+
+---
+# Load and inspect the `fgl` data
+
+The `fgl` data comes with the `{MASS}` library (which was loaded at the beginning of this lecture.)
+
+```r
+data(fgl) 
+
+fgl_wide &lt;- 
+  fgl %&gt;% 
+  as_tibble()
+```
+
+
+```r
+head(fgl_tbl)
+```
+
+```
+## # A tibble: 6 x 10
+##       RI    Na    Mg    Al    Si     K    Ca    Ba    Fe type 
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;
+## 1  3.01   13.6  4.49  1.1   71.8 0.06   8.75     0  0    WinF 
+## 2 -0.39   13.9  3.6   1.36  72.7 0.48   7.83     0  0    WinF 
+## 3 -1.82   13.5  3.55  1.54  73.0 0.39   7.78     0  0    WinF 
+## 4 -0.340  13.2  3.69  1.29  72.6 0.570  8.22     0  0    WinF 
+## 5 -0.580  13.3  3.62  1.24  73.1 0.55   8.07     0  0    WinF 
+## 6 -2.04   12.8  3.61  1.62  73.0 0.64   8.07     0  0.26 WinF
+```
+
+---
+# Tidy the data using `pivot_longer`
+
+The following code chunk transforms the date from wide to long format using the `pivot_longer()` function from the `{tidyr}` package (this will come in handy soon when we plot the data.):
+
+```r
+fgl_long &lt;- 
+  fgl_wide %&gt;% 
+  pivot_longer(-type, names_to = "feature", values_to = "value")
+
+fgl_long
+```
+
+```
+## # A tibble: 1,926 x 3
+##    type  feature value
+##    &lt;fct&gt; &lt;chr&gt;   &lt;dbl&gt;
+##  1 WinF  RI       3.01
+##  2 WinF  Na      13.6 
+##  3 WinF  Mg       4.49
+##  4 WinF  Al       1.1 
+##  5 WinF  Si      71.8 
+##  6 WinF  K        0.06
+##  7 WinF  Ca       8.75
+##  8 WinF  Ba       0   
+##  9 WinF  Fe       0   
+## 10 WinF  RI      -0.39
+## # ... with 1,916 more rows
+```
+
+
+---
+# Distribution of (some) feature values by glass type
+
+.pull-left[
+
+```r
+fgl_long %&gt;% 
+  filter(feature != "RI") %&gt;%
+  ggplot(aes(x = type, y = value, fill = feature)) +
+  geom_boxplot() +
+  facet_wrap(~ feature, scales = "free") +
+  theme_minimal() +
+  scale_fill_viridis_d() +
+  theme(legend.position = "none")
+```
+Some of the features are clear discriminators, e.g., `Ba` is barely present in all glass types but `Head`.
+]
+.pull-right[
+
+![](06-classification_files/figure-html/unnamed-chunk-28-1..svg)&lt;!-- --&gt;
+
+]
+
+---
+# Preprocess the data (some interactions)
+
+To make the feature set more "interesting" we add interactions with `RI`:
+
+```r
+fgl_interact &lt;- 
+  recipe(type ~ ., data = fgl) %&gt;% 
+  step_interact(~ all_predictors() * RI) %&gt;% 
+  step_zv(all_predictors()) %&gt;% 
+  prep() %&gt;% 
+  juice()
+
+head(fgl_interact)
+```
+
+```
+## # A tibble: 6 x 18
+##       RI    Na    Mg    Al    Si     K    Ca    Ba    Fe type  RI_x_Na RI_x_Mg RI_x_Al
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1  3.01   13.6  4.49  1.1   71.8 0.06   8.75     0  0    WinF    41.1    13.5    3.31 
+## 2 -0.39   13.9  3.6   1.36  72.7 0.48   7.83     0  0    WinF    -5.42   -1.40  -0.530
+## 3 -1.82   13.5  3.55  1.54  73.0 0.39   7.78     0  0    WinF   -24.6    -6.46  -2.80 
+## 4 -0.340  13.2  3.69  1.29  72.6 0.570  8.22     0  0    WinF    -4.49   -1.25  -0.439
+## 5 -0.580  13.3  3.62  1.24  73.1 0.55   8.07     0  0    WinF    -7.70   -2.10  -0.719
+## 6 -2.04   12.8  3.61  1.62  73.0 0.64   8.07     0  0.26 WinF   -26.1    -7.36  -3.30 
+## # ... with 5 more variables: RI_x_Si &lt;dbl&gt;, RI_x_K &lt;dbl&gt;, RI_x_Ca &lt;dbl&gt;,
+## #   RI_x_Ba &lt;dbl&gt;, RI_x_Fe &lt;dbl&gt;
+```
+
+---
+# Prepare input to `glmnet`
+
+Before we fit the model, we need to transform the data to outcome and feature matrices.
+
+```r
+y &lt;- 
+  fgl_interact %&gt;%
+  pull(type)
+
+x &lt;- 
+  fgl_interact %&gt;%
+  select(-type) %&gt;% 
+  as.matrix()
+```
+Note that `y` is a one-dimensional _factor_.
+
+---
+# Cross-validation using `glmnet`
+
+.pull-left[
+We can estimate the regularized version of the model using `glmnet` with `family = "multinomial"`:
+
+```r
+fit &lt;- cv.glmnet(
+  x = x,
+  y = y,
+  family = "multinomial"
+)
+```
+and plot the cross-validation results using `plot`
+
+```r
+plot(fit)
+```
+]
+.pull-right[
+![](06-classification_files/figure-html/unnamed-chunk-32-1..svg)&lt;!-- --&gt;
+]
+
+
+---
+# Multiclass prediction
+
+.pull.left[
+We now extract the predicted class and predicted probabilities pf belonging to each class
+
+```r
+class &lt;- 
+  fit %&gt;% 
+  predict(newx = x, s = "lambda.1se", type = "class")
+
+prob &lt;-
+  fit %&gt;% 
+  predict(newx = x, s = "lambda.1se", type = "response") %&gt;% 
+  as_tibble()
+```
+
+---
+# Maximum probability rule 
+
+We can rearrange `class` and `prob` as a nice `tibble`:
+
+```r
+fgl_pred &lt;- 
+  fgl_wide %&gt;% 
+  select(type) %&gt;%
+  mutate(
+    class = class[,1],
+    class = factor(class, levels = levels(type))
+  ) %&gt;% 
+  bind_cols(prob)
+```
+Predicted class is determined using the _maximum probability rule_.
+
+```r
+fgl_pred %&gt;% sample_n(5)
+```
+
+```
+## # A tibble: 5 x 8
+##   type  class  WinF.1 WinNF.1  Veh.1   Con.1 Tabl.1 Head.1
+##   &lt;fct&gt; &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Veh   WinF  0.687    0.208  0.0612 0.00583 0.0270 0.0110
+## 2 WinNF WinNF 0.247    0.489  0.118  0.0995  0.0149 0.0323
+## 3 WinF  WinF  0.489    0.357  0.0935 0.0248  0.0174 0.0174
+## 4 Head  Head  0.00325  0.0937 0.0212 0.218   0.0531 0.610 
+## 5 WinNF WinF  0.516    0.352  0.0851 0.0175  0.0176 0.0124
+```
+
+
+---
+# Multiclass confusion matrix
+
+We can print the multiclass confusion matrix using the `conf_mat()` function (from `{yardstick}`):
+
+```r
+fgl_pred %&gt;% 
+  conf_mat(type, class)
+```
+
+```
+##           Truth
+## Prediction WinF WinNF Veh Con Tabl Head
+##      WinF    54    17   8   0    0    1
+##      WinNF   16    59   9   8    6    2
+##      Veh      0     0   0   0    0    0
+##      Con      0     0   0   4    0    1
+##      Tabl     0     0   0   0    1    0
+##      Head     0     0   0   1    2   25
+```
+
+For example, our model correctly classified `\(54\)` observations as `WinF` out of all predicted `WinF` ( `\(54/80 = 67.5\%\)` precision rate.)
+
+On the other hand, the model correctly predicted `\(54\)` `WinF`out of the number of actual `WinF`, `\(64\)`, which is `\(54/64=84.4\%\)`. 
+
+---
+# Multiclass ROC curve(s)
+
+.pull-left[
+A one-vs-all approach is often taken to calculate multiple ROC curves.
+
+We can plot multiclass ROC curves using the `roc_curve` function (from `{yardstick}`):
+
+```r
+fgl_pred %&gt;% 
+  roc_curve(type, WinF.1:Head.1) %&gt;% 
+  autoplot()
+```
+where `WinF.1:Head.1` are the model's fitted probabilities.
+
+See how the model fails to distinguish between `Veh` and the others, whereas classifying as `Tabl` is almost perfect.
+]
+.pull-right[
+![](06-classification_files/figure-html/unnamed-chunk-37-1..svg)&lt;!-- --&gt;
+]
+
+---
+# Multiclass ROC-AUC
+
+[Hand and Till (2001)](https://link.springer.com/article/10.1023/A:1010920819831) extend the definition to the case of more than two classes by averaging pairwise comparisons.
+
+Calculating the multiclass AUC value can be done using the `roc_auc` function from the `{yardstick}` function:
+
+```r
+fgl_pred %&gt;% 
+  roc_auc(type, WinF.1:Head.1)
+```
+
+```
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc hand_till      0.873
+```
 
 
 ---
@@ -741,13 +1097,14 @@ class: .title-slide-final, center, inverse, middle
 
 [&lt;i class="fa fa-github"&gt;&lt;/i&gt; Source code](https://github.com/ml4econ/notes-spring2019/tree/master/06-classification)  
 
-
-
-
 ---
 # References
 
+Hand, Till (2001). "A Simple Generalisation of the Area Under the ROC Curve for Multiple Class Classification Problems". _Machine Learning_. Vol 45, Iss 2, pp 171-186.
+
 Lantz, Brett. Machine Learning with R: Expert techniques for predictive modeling, 3rd Edition (p. 333). Packt Publishing.
+
+Taddy, Matt. B_usiness Data Science: Combining Machine Learning and Economics to Optimize, Automate, and Accelerate Business Decisions_. McGraw-Hill Education.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
