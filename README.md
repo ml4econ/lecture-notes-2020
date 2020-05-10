@@ -61,7 +61,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 ## Slides
 
-### Part I
+### Part I: Supervised Machine Learning
 
 1. [Course Overview](https://raw.githack.com/ml4econ/lecture-notes-2020/master/01-overview/01-overview.html)  
 
@@ -81,17 +81,21 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 7. [Trees and Forests](https://raw.githack.com/ml4econ/lecture-notes-2020/master/07-trees-forests/07-trees-forests.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/07-trees-forests/07-trees-forests.pdf) 
 
-8. [Unsupervised Learning]()
 
-9. [Text Analysis]()
-
-### Part II
+### Part II: Causal Inference and ML
 
 TBA
 
+
+### Part III: Unsupervised Learning
+
+12. [Unsupervised Learning]()
+
+13. [Text Analysis]()
+
 ### Projects
 
-1. [Kaggle competition](https://raw.githack.com/ml4econ/lecture-notes-2020/master/a-kaggle/a-kaggle.html)
+1. [Kaggle competition](https://raw.githack.com/ml4econ/lecture-notes-2020/master/a-kaggle/a-kaggle.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/a-kaggle/a-kaggle.pdf)
 
 
 
