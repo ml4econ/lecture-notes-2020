@@ -1,0 +1,954 @@
+---
+title: "08 - Causal Inference"
+subtitle: "ml4econ, HUJI 2020"
+author: "Itamar Caspi"
+date: "May 18, 2019 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      beforeInit: "https://platform.twitter.com/widgets.js"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+      
+---
+
+# Replicating this presentation
+
+Use the [pacman](https://cran.r-project.org/web/packages/pacman/vignettes/Introduction_to_pacman.html) package to install and load packages:
+
+```{r packages, message=FALSE, warning=FALSE}
+if (!require("pacman"))
+  install.packages("pacman")
+
+pacman::p_load(
+  tidyverse,   # for data wrangling and visualization
+  tidymodels,  # for modeling
+  haven,       # for reading dta files
+  here,        # for referencing folders
+  dagitty,     # for generating DAGs
+  ggdag,       # for drawing DAGs
+  knitr        # for printing html tables
+)
+```
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+
+knitr::opts_chunk$set(eval = TRUE,
+                      echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      cache = TRUE)
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+```{r plots_and_figures, include=FALSE}
+```
+
+---
+
+# Outline
+
+- [Causal Inference](#caus)
+
+- [Potential Outcomes](#pot)
+
+- [Directed Acyiclic Graphs](#pot)
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: caus
+
+# Causal Inference
+
+
+
+---
+# Predicting vs. explaining
+
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/xkcd.png")
+```
+
+Source: [XKCD](https://xkcd.com/552/)
+
+---
+# Looking forward
+
+- Until now, our focus what on prediction.
+
+- However, what we economists mostly care about is causal inference:
+  - What is the effect of class size on student performance?
+  - What is the effect of education on earnings?
+  - What is the effect of government spending on GDP?
+  - etc.
+  
+- Before we learn how to adjust and apply ML method to causal inference problems, we need to be explicit about what causal inference is.
+
+- This lecture will review two dominant approaches to causal inference, the statistical/econometric approach and the computer science approach.
+
+
+---
+# A note on identification
+
+- The primary focus of this lecture is on identification, as opposed to prediction, estimation and inference.
+
+- In short, identification is defined as
+
+_"model parameters or features being uniquely determined from the observable population that generates the data."_ - (Lewbel, 2019)
+
+- More specifically, think about identifying the parameter of interest when you have unlimited data (the entire population).
+
+---
+class: title-slide-section-blue, center, middle
+name: pot
+
+# Potential Outcomes
+
+
+---
+# Pearl and Rubin
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/rubin-pearl.png")
+```
+
+__Source__: The Book of Why (Pearl and Mackenzie)
+
+---
+# Rubin and  potential outcomes
+
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/rubin.png")
+```
+
+__Source__: The Book of Why (Pearl and Mackenzie)
+
+---
+# The road not taken
+
+```{r, echo=FALSE, out.width = "100%", fig.align='center'}
+knitr::include_graphics("figs/roads.png")
+```
+
+
+Source: [https://mru.org/courses/mastering-econometrics/ceteris-paribus](https://mru.org/courses/mastering-econometrics/ceteris-paribus)
+
+---
+# Notation
+
+- $Y$ is a random variable
+
+- $X$ is a vector of attributes
+
+- $\mathbf{X}$ is a design matrix
+
+
+
+---
+# Treatment and potential outcomes (Rubin, 1974, 1977)
+
+- Treatment
+
+$$D_i=\begin{cases}
+    1, & \text{if unit } i \text{ received the treatment} \\
+    0, & \text{otherwise.}
+\end{cases}$$
+
+--
+
+- Treatment and potential outcomes
+
+$$\begin{matrix}
+    Y_{i0} & \text{is the potential outcome for unit } i \text{ with } D_i = 0\\
+    Y_{i1} & \text{is the potential outcome for unit } i \text{ with }D_i = 1
+\end{matrix}$$
+
+
+--
+
+- Observed outcome: Under the Stable Unit Treatment Value Assumption (SUTVA), The realization of unit $i$'s outcome is
+
+$$Y_i = Y_{1i}D_i + Y_{0i}(1-D_i)$$
+
+--
+
+__Fundamental problem of causal inference__ (Holland, 1986): We cannot observe _both_ $Y_{1i}$ and $Y_{0i}$.
+
+
+---
+# Treatment effect and observed outcomes
+
+- Individual treatment effect: The difference between unit $i$'s potential outcomes:
+
+$$\tau_i = Y_{1i} - Y_{0i}$$
+
+
+--
+
+- _Average treatment effect_ (ATE)
+
+$$\mathbb{E}[\tau_i] = \mathbb{E}[Y_{1i}-Y_{0i}] = \mathbb{E}[Y_{1i}]-\mathbb{E}[Y_{0i}]$$
+
+--
+
+
+- _Average treatment effect for the treatment group_ (ATT)
+
+$$\mathbb{E}[\tau_i | D_i=1] = \mathbb{E}[Y_{1i}-Y_{0i}| D_i=1] = \mathbb{E}[Y_{1i}| D_i=1]-\mathbb{E}[Y_{0i}| D_i=1]$$
+
+__NOTE:__ The complement of the treatment group is the _control_ group.
+
+---
+
+# Selection bias
+
+
+A naive estimand for ATE is the difference between average outcomes based on treatment status
+
+However, this might be misleading:
+
+$$\begin{aligned} \mathbb{E}\left[Y_{i} | D_{i}=1\right]-\mathbb{E}\left[Y_{i} | D_{i}=0\right] &=\underbrace{\mathbb{E}\left[Y_{1 i} | D_{i}=1\right]-\mathbb{E}\left[Y_{0i} | D_{i}=1\right]}_{\text{ATT}} +
+\underbrace{\mathbb{E}\left[Y_{0 i} | D_{i}=1\right]-\mathbb{E}\left[Y_{0i} | D_{i}=0\right]}_{\text{selection bias}}
+\end{aligned}$$
+
+
+> __Causal inference is mostly about eliminating selection-bias__
+
+
+__EXAMPLE:__ Individuals who go to private universities probably have different characteristics than those who go to public universities.
+
+---
+
+# Randomized control trial (RCT) solves selection bias
+
+In an RCT, the treatments are randomly assigned. This means entails that $D_i$ is _independent_ of potential outcomes, namely
+
+$$\{Y_{1i}, Y_{0i}\}  \perp D_i$$
+
+RCTs enables us to estimate ATE using the average difference in outcomes by treatment status:
+
+$$\begin{aligned} \mathbb{E}\left[Y_{i} | D_{i}=1\right]-\mathbb{E}\left[Y_{i} | D_{i}=0\right] &=\mathbb{E}\left[Y_{1 i} | D_{i}=1\right]-\mathbb{E}\left[Y_{0i} | D_{i}=0\right] \\ &=\mathbb{E}\left[Y_{1 i} | D_{i}=1\right]-\mathbb{E}\left[Y_{0 i} | D_{i}=1\right] \\
+&= \mathbb{E}\left[Y_{1 i}-Y_{0 i} | D_{i}=1\right] \\
+&= \mathbb{E}\left[Y_{1 i}-Y_{0 i}\right] \\
+&= \text{ATE}
+\end{aligned}$$
+
+__EXAMPLE:__ In theory, randomly assigning students to private and public universities would allow us to estimate the ATE going to private school have on future earnings. Clearly, RCT in this case is infeasible.
+
+---
+
+# Estimands and regression
+
+
+Assume for now that the treatment effect is constant across all individuals, i.e., 
+
+$$\tau = Y_{1i}-Y_{0i},\quad \forall i.$$ 
+
+Accordingly, we can express $Y_i$ as
+
+$$\begin{aligned}
+Y_i &= Y_{1i}D_i + Y_{0i}(1-D_i) \\
+&= Y_{0i} + D_i(Y_{1i} - Y_{0i}), \\
+&= Y_{0i} + \tau D_i, & \text{since }\tau = Y_{1i}-Y_{0i}\\
+&= \mathbb{E}[Y_{0i}] + \tau D_i + Y_{0i}-\mathbb{E}[Y_{0i}], & \text{add and subtract } \mathbb{E}[Y_{0i}]\\
+\end{aligned}$$
+
+Or more conveniently
+
+$$Y_i = \alpha + \tau D_i + u_i,$$
+
+where $\alpha = \mathbb{E}[Y_{0i}]$ and $u_i = Y_{0i}-\mathbb{E}[Y_{0i}]$ is the random component of $Y_{0i}$.
+
+
+---
+# Unconfoundedness
+
+Typically, in observational studies, treatments are not randomly assigned. (Think of $D_i = \{\text{private}, \text{public}\}$.) 
+
+
+In this case, identifying causal effects depended on the _Unconfoundedness_ assumption (also known as "selection-on-observable"), which is defined as
+
+$$\{Y_{1i}, Y_{0i}\}  \perp D_i | {X}_i$$
+In words: treatment assignment is independent of potential outcomes _conditional_ on observed ${X}_i$, i.e., selection bias _disappears_ when we control for ${X}_I$.
+
+
+
+---
+# Adjusting for confounding factors
+
+
+The most common approach for controlling for $X_i$ is by adding them to the regression:
+
+$$Y_i = \alpha + \tau D_i + {X}_i'\boldsymbol{\beta} + u_i,$$
+__COMMENTS__:
+
+  1. Strictly speaking, the above regression model is valid if we actually _believe_ that the "true" model is $Y_i = \alpha + \tau D_i + {X}_i'\boldsymbol{\beta} + u_i.$ 
+  
+  2. If $D_i$ is randomly assigned, adding ${X}_i$ to the regression __might__ increases the accuracy of ATE.
+  
+  3. If $D_i$ is assigned conditional on ${X}_i$ (e.g., in observational settings), adding ${X}_i$ to the regression eliminates selection bias.
+
+
+
+---
+# Illustration: the OHIE data
+
+- The Oregon Health Insurance Experiment (OHIE), is a randomized controlled trial for measuring the treatment effect of Medicade eligibility.
+
+- Treatment group: Those selected in the Medicade lottery.
+
+- The outcome, `doc_any_12m`, equals to 1 for patients who saw a primary care physician, and zero otherwise.
+
+
+---
+# Load the OHIE data
+
+```{r}
+descr <- 
+  here("08-causal-inference/data",
+       "oregonhie_descriptive_vars.dta") %>% 
+  read_dta()
+
+prgm <- 
+  here("08-causal-inference/data",
+       "oregonhie_stateprograms_vars.dta") %>% 
+  read_dta()
+
+s12 <- 
+  here("08-causal-inference/data",
+       "oregonhie_survey12m_vars.dta") %>% 
+  read_dta()
+
+```
+
+The entire OHIE data can be found [here](http://nber.org/oregon/4.data.html).
+
+---
+# Preprocessing: Joining datasets
+
+```{r}
+ohie_raw <- 
+  descr %>% 
+  left_join(prgm) %>% 
+  left_join(s12) %>% 
+  filter(sample_12m_resp == 1) %>% 
+  drop_na(
+    weight_12m,doc_any_12m, doc_num_mod_12m,
+    er_any_12m,er_num_mod_12m,
+    hosp_any_12m,hosp_num_mod_12m
+  )
+```
+
+---
+# Preprocessing: Refinement
+```{r}
+ohie <- 
+  ohie_raw %>% 
+  rename(
+    enrolled = ohp_all_ever_firstn_30sep2009,
+    selected = treatment
+  ) %>%
+  dplyr::select(
+    person_id, household_id,
+    numhh_list, selected,
+    enrolled, doc_any_12m
+  ) %>% 
+  mutate(numhh_list = factor(numhh_list, levels = c("1", "2", "3")))
+```
+
+---
+# The final dataset
+
+```{r}
+ohie
+```
+
+---
+# Distribution of treated-control
+
+```{r}
+ohie %>% 
+  count(selected) %>%
+  kable(format = "html")
+```
+
+---
+# Estimating ATE
+
+The estimated model
+$$doc\_any\_12m_i = \alpha + \tau\times selected_i + \varepsilon_i$$
+In R:
+```{r}
+fit <- lm(doc_any_12m ~ selected, data = ohie)
+```
+
+---
+# Results
+```{r}
+fit %>% 
+  tidy(conf.int = TRUE) %>% 
+  filter(term != "(Intercept)") %>% 
+  dplyr::select(term, estimate, starts_with("conf.")) %>% 
+  kable(digits = 4, format = "html")
+```
+
+__Interpretation:__ being selected in the lottery increases the probability that you visit primary care physician in the following year by 5.75 [4.49, 7.01] percentage points.
+
+
+
+---
+# Adjustments
+
+One issue with OHIE is that people are able to apply for Medicaid for their entire household.
+
+This fact undermines the critical random assignment assumption since belonging to larger households increases the chances of being selected to Medicade.
+
+```{r}
+ohie %>% 
+  count(selected, numhh_list) %>% 
+  kable(format = "html")
+```
+
+
+---
+# ATE under adjustment
+
+```{r}
+lm(doc_any_12m ~ selected + numhh_list, data = ohie) %>% 
+  tidy(conf.int = TRUE) %>% 
+  dplyr::select(term, estimate, starts_with("conf.")) %>% 
+  kable(digits = 4, format = "html")
+```
+
+
+After adjusting for `numhh_list`, ATE has increased from 0.057 to 0.064. Can you guess why?
+
+
+
+
+---
+class: title-slide-section-blue, center, middle
+name: pot
+
+# Directed Acyclic Graphs
+
+
+---
+# Pearl and DAGs
+
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/pearl.png")
+```
+
+__Source__: The Book of Why (Pearl and Mackenzie)
+
+---
+# DAGs (Pearl)
+
+.pull-left[
+A DAG is a way to model a system of causal interactions using graphs.
+
+
+- __Nodes__ represents random variables, e.g., $X$, $Y$, etc.
+
+- __Arrows__ (or directed edges) represent "from $\rightarrow$ to" causal effects. For example, $Z\rightarrow X$ reads " $Z$ causes $X$".
+
+- A __path__ is a sequence of edges connecting two nodes. For example, $Z\rightarrow X \rightarrow M \leftarrow Y$ describes a path from $Z$ to $Y$.
+  - In a __direct path__ arrows point to the same direction: $Z\rightarrow X \rightarrow M$
+]
+.pull-right[
+```{r, echo=FALSE}
+dag <- dagify(
+  X ~ Z,
+  M ~ X,
+  M ~ Y
+) 
+dag %>% 
+  ggdag(text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+---
+#DAGs and SEM
+
+- Another way to think about DAGs is as non-parametric __structural equation models__ (SEM)
+
+- For example, the single-confounder DAG, $D\leftarrow X\rightarrow Y$, can be represented by a set of three equations:  
+
+$$\begin{array}{l}
+X\leftarrow f_X\left(U_{X}\right) \\
+D\leftarrow f_D\left(X, U_D\right)\\
+Y\leftarrow f_Y(D,X,U_Y)
+\end{array}$$
+where 
+- The $f_{i}$'s denote the causal mechanisms in the model. Are not restricted to be linear.
+- $U_X,U_D,U_Y$ denote independent background factors that the we chooses not to include in the analysis.
+- Assignment operator $(\leftarrow)$ captures asymmetry of causal relationships.
+
+---
+# Confounder
+
+.pull-left[
+- $X$ is a common cause of $D$ and $Y$.
+
+- conditioning on $X$ removes dependency between $D$ and $Y$
+
+- In DAG terms, controlling for X "closes the backdoor path" between $D$ and $Y$, and leaves open the direct path.
+
+- The notion of closing the backdoor path is similar to dealing with the omitted variable bias.
+
+]
+.pull-right[
+```{r, echo=FALSE}
+dag <- dagify(
+  D ~ X,
+  Y ~ X
+) 
+dag %>% 
+  ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+---
+# Unconfoundedness in DAGs
+
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/unconfoundedness.png")
+```
+
+Source: Imbens (forthcoming).
+
+---
+# Example: Identifying the Returns to Education
+
+
+```{r, echo=FALSE, fig.align='center', out.width='50%'}
+include_graphics("figs/wage-dag.png")
+```
+
+Source: Imbens (forthcoming).
+
+
+---
+# Instrumental variables in DAGs
+
+.pull-left[
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/iv1.png")
+```
+Source: Imbens (forthcoming).
+
+]
+.pull-right[
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/iv2.png")
+```
+]
+
+---
+# Mediator
+
+.pull-left[
+- $D$ causes $M$ causes $Y$.
+
+- $M$ mediates the causal effect of $D$ on $Y$
+
+- conditioning on $M$ removes dependency between $D$ and $Y$
+
+- We've essentially closed a direct path (the only direct path between $D$ and $Y$.
+
+]
+.pull-right[
+```{r, echo=FALSE}
+dag <- dagify(
+  Y ~ M,
+  M ~ D
+) 
+dag %>% 
+  ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+
+---
+# Collider
+
+.pull-left[
+
+- $D$ are $Y$ are independent.
+
+- $D$ and $Y$ jointly cause $C$.
+
+- conditioning on $C$ creates dependency between $D$ and $Y$
+
+]
+.pull-right[
+```{r, echo=FALSE}
+dag <- dagify(
+  C ~ D,
+  C ~ Y
+) 
+dag %>% 
+  ggdag(layout = "mds", text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+---
+# Example: "Bad controls"
+
+.pull-left[
+- "Bad controls" are variables that are themselves outcome variables.
+
+- This distinction becomes important when dealing with high-dimensional data
+
+__EXAMPLE:__ Occupation as control in a return to years of schooling regression.
+
+Discovering that a person works as a developer in a high-tech firm changes things; knowing that the person does not have a college degree tells us immediately that he is likely to be highly capable.
+]
+.pull-right[
+```{r, echo=FALSE}
+collider_triangle(m = "Developer", x = "College", y = "Talent") %>% 
+  ggdag(use_labels = "label", text_size = 10) +
+  theme_dag()
+```
+]
+
+
+---
+# Collider: M-bias
+
+```{r, echo=FALSE, fig.align='center'}
+m_bias(x = "Education", y = "Diabetes", a = "Income during\nChildhood", 
+       b = "Genetic Risk \nfor Diabetes", m = "Mother's Diabetes") %>% 
+  ggdag(text_size = 6, use_labels = "label") +
+  theme_dag()
+```
+
+
+
+---
+# Simulation I: De-counfounding
+
+.pull-left[
+```{r}
+n <- 1000
+p <- 3
+
+u <- matrix(rnorm(n * p), n, p)
+
+x <- u[,2]
+d <- 0.8 * x + 0.6 * u[,1]
+y <- 0 * d + 0.2 * x + u[,3]
+```
+
+```{r}
+cor(cbind(y,x,d)) %>% 
+  kable(digits = 1, format = "html")
+```
+]
+.pull-right[
+```{r, echo=FALSE}
+dag <- dagify(
+  Y ~ X,
+  D ~ X,
+  Y ~ D
+) 
+dag %>% 
+  ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+---
+# Simulation I: De-counfounding
+
+.pull-left[
+
+`y ~ d + x`
+```{r, echo=FALSE}
+lm(y ~ d + x) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>% 
+  kable(digits = 2, format = "html")
+```
+
+`y ~ d`
+```{r, echo=FALSE}
+lm(y ~ d) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>% 
+  kable(digits = 2, format = "html")
+```
+]
+.pull-right[
+```{r, echo=FALSE}
+dag <- dagify(
+  Y ~ X,
+  D ~ X,
+  Y ~ D
+) 
+dag %>% 
+  ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+```
+]
+
+---
+# Simulation II: M-bias
+
+.pull-left[
+```{r}
+n <- 1000
+p <- 3
+
+u <- matrix(rnorm(n * p), n, p)
+
+d <- u[,1]
+x <- 0.8 * u[,1] + 0.2 * u[,2] + 0.6 * u[,3]
+y <- 0 * d + u[,2]
+```
+
+```{r}
+cor(cbind(y,x,d)) %>% 
+  kable(digits = 1, format = "html")
+```
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 2, 0,
+  "Ud", 0, 1,
+  "Uy", 2, 1,
+  "X",  1, 0.5
+)
+
+dag <- dagify(
+  X ~ Uy + Ud,
+  D ~ Ud,
+  Y ~ Uy, 
+  exposure = "X",
+  outcome = "Y",
+  coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+---
+# Simulation II: M-bias
+
+.pull-left[
+`y ~ d + x`
+```{r, echo=FALSE}
+lm(y ~ d + x) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>%
+  kable(digits = 2, format = "html")
+```
+
+`y ~ d`
+```{r, echo=FALSE}
+lm(y ~ d) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>% 
+  kable(digits = 2, format = "html")
+```
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 2, 0,
+  "Ud", 0, 1,
+  "Uy", 2, 1,
+  "X",  1, 0.5
+)
+
+dag <- dagify(
+  X ~ Uy + Ud,
+  D ~ Ud,
+  Y ~ Uy, 
+  exposure = "X",
+  outcome = "Y",
+  coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+---
+# Simulation III: Mediator
+
+.pull-left[
+```{r}
+n <- 1000
+p <- 3
+
+u <- matrix(rnorm(n * p), n, p)
+
+d <- u[,1]
+x <- 1.3 * d + u[,2]
+y <- 0.1 * d + 0.07 * x + u[,3]
+```
+
+```{r}
+cor(cbind(y,x,d)) %>% 
+  kable(digits = 1, format = )
+```
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 1, 0,
+  "X", 0.5, 0.5
+)
+dag <- dagify(
+ X ~ D,
+ Y ~ X,
+ Y ~ D,
+ exposure = "D",
+ outcome = "Y",
+ coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+
+---
+# Simulation III: Mediator
+
+.pull-left[
+`y ~ d + x`
+```{r, echo=FALSE}
+lm(y ~ d + x) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>% 
+  kable(digits = 2, format = "html")
+```
+
+`y ~ d`
+
+```{r, echo=FALSE}
+lm(y ~ d) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>% 
+  kable(digits = 2, format = "html")
+```
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 1, 0,
+  "X", 0.5, 0.5
+)
+dag <- dagify(
+ X ~ D,
+ Y ~ X,
+ Y ~ D,
+ exposure = "D",
+ outcome = "Y",
+ coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+
+---
+# Limitations of DAGs
+
+- Hard to write down a DAG for complicated (econometric) structural models.
+
+- Need to specify the entire DGP (it REALY a limitation?)
+
+- Simultaneity
+
+_"In fact it is not immediately obvious to me how one would capture supply and demand models in a DAG"_ - Imbens (forthcoming)
+
+```{r, echo=FALSE, fig.align='center', out.width='55%'}
+include_graphics("figs/sim.png")
+```
+
+
+---
+# Recommended introductory level resources on DAGS
+
+- [The Book of Why](http://bayes.cs.ucla.edu/WHY/) by Pearl and Mackenzie.
+
+- [Causal Inference in Machine Learning and Al](https://www.dropbox.com/s/ps4a0iwc0q51q9z/Hunermund%20-%20Causal%20Inference%20in%20ML%20and%20AI.pdf) by Paul Hünermund.
+
+- [Causal Inference: The Mixtape (pp. 67-80)](https://www.scunning.com/mixtape.html) by Scott Cunningham.
+
+- [Potential Outcome and Directed Acyclic Graph Approaches to Causality: Relevance for Empirical Practice in Economics](https://www.aeaweb.org/articles?id=10.1257/jel.20191597&&from=f) by Guido W. Imbens
+
+- [A Crash Course in Good and Bad Controls](https://ftp.cs.ucla.edu/pub/stat_ser/r493.pdf) by Cinelli, Forney, and Pearl, J. (2020).
+
+---
+# Next time: Causal inference in high-dimensional setting
+
+Consider again the standard "treatment effect regression":
+
+$$Y_i=\alpha+\underbrace{\tau D_i}_{\text{low dimensional}} +\underbrace{\sum_{j=1}^{k}\beta_{j}X_{ij}}_{\text{high dimensional}}+\varepsilon_i,\quad\text{for }i=1,\dots,n$$
+Our object of interest is $\widehat{\tau}$, the estimated _average treatment effect_ (ATE).  
+
+In high-dimensional settings $k \gg n$.
+
+
+---
+class: .title-slide-final, center, inverse, middle
+
+# `slides %>% end()`
+
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/08-causal-inference)  
+
+
+---
+# Selected references
+
+
+Hünermund, P., & Bareinboim, E. (2019). Causal Inference and Data-Fusion in Econometrics. arXiv preprint arXiv:1912.09104.
+
+Imbens, W. G. (forthcoming). Potential Outcome and Directed Acyclic Graph Approaches to Causality: Relevance for Empirical Practice in Economics. _Journal of Economic Literature_.
+
+Lewbel, A. (2019). The identification zoo: Meanings of identification in econometrics. _Journal of Economic Literature_, 57(4), 835-903.

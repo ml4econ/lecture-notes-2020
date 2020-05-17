@@ -45,7 +45,7 @@ if (!require("pacman")) install.packages("pacman")
 
 pacman::p_load(
   tidyverse,   # for data wrangling and visualization
-  tidymodels,
+  tidymodels,  # for modeling
   knitr,       # for displaying nice tables
   here,        # for referencing folders and files
   glmnet,      # for estimating lasso and ridge
@@ -653,42 +653,48 @@ name: mult
 ---
 # Multiclass outcomes
 
-- Each observation belongs to one of $K$ Classes
+- Each observation belongs to one of $j=1,\ldots,G$ Classes (groups)
 
 - Outcome variable
-$$y = (y_{1},\ldots,y_{K})$$ 
-where $y_{k}=1$ if the outcome belongs to the $k^{\text{th}}$ class, and zero otherwise. 
+$$y = (y_{1},\ldots,y_{G})$$ 
+where $y_{j}=1$ if the outcome belongs to the $j^{\text{th}}$ class, and zero otherwise. 
 
 - Conditional probability
-$$p_{k}\equiv\operatorname{Pr}\left(y_{k}=1 | \mathbf{x}_{}\right)$$
-In words: the $p_{k}$ is the probability that $y$ belongs to class $k$, given $\mathbf{x}_i$.
+$$p_{j}\equiv\operatorname{Pr}\left(y_{j}=1 | \mathbf{x}_{}\right),\qquad \text{for } j=1,\ldots,G$$
+In words: the $p_{g}$ is the probability that $y$ belongs to class $g$, given $\mathbf{x}_i$.
 
 ---
 # Multinomial regression model
 
-For each class $k=1,\ldots,K$, we model the outcome as
-$$p_{k}=\frac{\exp({\mathbf{x}^{\prime} \boldsymbol{\beta}_{j}})}{\sum_{k=1}^{K} \exp({\mathbf{x}^{\prime} \beta_{k}})}$$
-where there are $K$ coefficients for each variable (one per class).
+For each class we model the outcome as
+$$p_{j}=\frac{\exp({\mathbf{x}^{\prime} \boldsymbol{\beta}_{j}})}{\sum_{g=1}^{G} \exp({\mathbf{x}^{\prime} \beta_{g}})},\qquad \text{for } j=1,\ldots,G$$
+where $\sum_{j=1}^G p_j=1$.
+
+
 
 __NOTE:__ There is no explicit base class here since regularized solutions are not equivariant under base changes, and regularization automatically eliminates the redundancy
 
 ---
 # Likelihood and deviance
 
-The model-based likelihood can be written
-$$\prod_{i=1}^{N} \prod_{k=1}^{K} p_{i k}^{y_{i k}}$$
+Given probabilities $p_{i j}$ for $y_{i j}=1$, the probability of the observed data is proportional to
+$$\prod_{i=1}^{N} \prod_{j=1}^{G} p_{i j}^{y_{i j}}$$
+where $N$ is the total number of observations.
+
 Taking logs and multiplying by -2 yields the multinomial deviance
-$$-2 \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log \left(p_{i k}\right)$$
+$$-2 \sum_{i=1}^N \sum_{j=1}^G y_{i j} \log \left(p_{i j}\right)$$
 
 ---
 # Regularization
 
+Let $K$ denote the length of $\boldsymbol{\beta}$, i.e., the number of features in the model. 
+
+The coefficient matrix, $\mathbf{B}=\left[\boldsymbol{\beta}_{1} \cdots \boldsymbol{\beta}_{G}\right]$, has $K\times G$ elements: $G$ coefficients, one per class, times the number of features, $K$.
+
 Similar to the binomial case, we can minimized the deviance subject to a standard lasso type ( $\ell_1$ norm) penalty on $\beta$:
 
-$$\min _{\left(\beta_{0}, \beta\right) \in \mathbb{R}^{p+1}} \left\{-\frac{2}{N} \sum_{i=1}^N \sum_{k=1}^K y_{i k} \log p_{i k}+\lambda \sum_{i=1}^p \sum_{k=1}^K \left|\beta_{k j}\right|\right\}$$
-where $p_{ik} = \Lambda(\mathbf{x}_i^{\prime}\beta_{k})$,
-
-
+$$\min _{\mathbf{B} \in \mathbb{R}^{K\times G}} \left\{-\frac{2}{N} \sum_{i=1}^N \sum_{j=1}^G y_{i j} \log p_{i j}+\lambda \sum_{i=1}^{K-1} \sum_{j=1}^G \left|\beta_{i j}\right|\right\}$$
+where $p_{ij} = \Lambda(\mathbf{x}_i^{\prime}\beta_{j})$, and the intercepts are unregularized.
 ---
 # Illustration: Forensic glass data
 
@@ -753,11 +759,9 @@ fgl_long %>%
 Some of the features are clear discriminators, e.g., `Ba` is barely present in all glass types but `Head`.
 ]
 .pull-right[
-
 ```{r, ref.label = 'box_fgl', echo=FALSE}
 
 ```
-
 ]
 
 ---
@@ -818,8 +822,7 @@ plot(fit)
 ---
 # Multiclass prediction
 
-.pull.left[
-We now extract the predicted class and predicted probabilities pf belonging to each class
+The following code chunk extracts the predicted class and predicted probabilities pf belonging to each class
 ```{r}
 class <- 
   fit %>% 
@@ -862,7 +865,7 @@ fgl_pred %>%
 
 For example, our model correctly classified $54$ observations as `WinF` out of all predicted `WinF` ( $54/80 = 67.5\%$ precision rate.)
 
-On the other hand, the model correctly predicted $54$ `WinF`out of the number of actual `WinF`, $64$, which is $54/64=84.4\%$. 
+On the other hand, the model correctly predicted $54$ `WinF`out of the number of actual `WinF`, $64$, which is $54/70=77.1\%$. 
 
 ---
 # Multiclass ROC curve(s)
