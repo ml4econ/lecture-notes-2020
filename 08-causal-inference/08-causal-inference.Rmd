@@ -47,13 +47,13 @@ knitr::opts_chunk$set(eval = TRUE,
                       echo = TRUE,
                       warning = FALSE,
                       message = FALSE,
-                      cache = TRUE)
+                      cache = FALSE)
 
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+set.seed(1203)
 ```
 
-```{r plots_and_figures, include=FALSE}
-```
 
 ---
 
@@ -64,6 +64,8 @@ htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 - [Potential Outcomes](#pot)
 
 - [Directed Acyiclic Graphs](#pot)
+
+- [Simulations](#sim)
 
 
 
@@ -101,6 +103,15 @@ Source: [XKCD](https://xkcd.com/552/)
 
 
 ---
+# Pearl and Rubin
+```{r, echo=FALSE, fig.align='center'}
+include_graphics("figs/rubin-pearl.png")
+```
+
+__Source__: The Book of Why (Pearl and Mackenzie)
+
+
+---
 # A note on identification
 
 - The primary focus of this lecture is on identification, as opposed to prediction, estimation and inference.
@@ -116,24 +127,6 @@ class: title-slide-section-blue, center, middle
 name: pot
 
 # Potential Outcomes
-
-
----
-# Pearl and Rubin
-```{r, echo=FALSE, fig.align='center'}
-include_graphics("figs/rubin-pearl.png")
-```
-
-__Source__: The Book of Why (Pearl and Mackenzie)
-
----
-# Rubin and  potential outcomes
-
-```{r, echo=FALSE, fig.align='center'}
-include_graphics("figs/rubin.png")
-```
-
-__Source__: The Book of Why (Pearl and Mackenzie)
 
 ---
 # The road not taken
@@ -315,6 +308,7 @@ __COMMENTS__:
 ---
 # Load the OHIE data
 
+In this illustration we will join 3 seperate (stata) files and load them to R using the [`{haven}`](https://haven.tidyverse.org/) package:
 ```{r}
 descr <- 
   here("08-causal-inference/data",
@@ -338,34 +332,27 @@ The entire OHIE data can be found [here](http://nber.org/oregon/4.data.html).
 ---
 # Preprocessing: Joining datasets
 
+Join 3 data frames and remove empty responses:
 ```{r}
 ohie_raw <- 
   descr %>% 
   left_join(prgm) %>% 
   left_join(s12) %>% 
   filter(sample_12m_resp == 1) %>% 
-  drop_na(
-    weight_12m,doc_any_12m, doc_num_mod_12m,
-    er_any_12m,er_num_mod_12m,
-    hosp_any_12m,hosp_num_mod_12m
-  )
+  drop_na(doc_any_12m)
 ```
 
 ---
 # Preprocessing: Refinement
+
+Select the relevant variables and re-level `numhh_list` (household size)
 ```{r}
 ohie <- 
   ohie_raw %>% 
-  rename(
-    enrolled = ohp_all_ever_firstn_30sep2009,
-    selected = treatment
-  ) %>%
-  dplyr::select(
-    person_id, household_id,
-    numhh_list, selected,
-    enrolled, doc_any_12m
-  ) %>% 
-  mutate(numhh_list = factor(numhh_list, levels = c("1", "2", "3")))
+  dplyr::select(numhh_list, treatment, doc_any_12m) %>% 
+  mutate(
+    numhh_list = factor(numhh_list, levels = c("1", "2", "3"))
+  )
 ```
 
 ---
@@ -380,7 +367,7 @@ ohie
 
 ```{r}
 ohie %>% 
-  count(selected) %>%
+  count(treatment) %>%
   kable(format = "html")
 ```
 
@@ -391,7 +378,7 @@ The estimated model
 $$doc\_any\_12m_i = \alpha + \tau\times selected_i + \varepsilon_i$$
 In R:
 ```{r}
-fit <- lm(doc_any_12m ~ selected, data = ohie)
+fit <- lm(doc_any_12m ~ treatment, data = ohie)
 ```
 
 ---
@@ -404,7 +391,7 @@ fit %>%
   kable(digits = 4, format = "html")
 ```
 
-__Interpretation:__ being selected in the lottery increases the probability that you visit primary care physician in the following year by 5.75 [4.49, 7.01] percentage points.
+__Interpretation:__ being selected in the lottery increases the probability that you visit primary care physician in the following year by 5.72 [4.47, 7.97] percentage points.
 
 
 
@@ -417,23 +404,32 @@ This fact undermines the critical random assignment assumption since belonging t
 
 ```{r}
 ohie %>% 
-  count(selected, numhh_list) %>% 
+  count(treatment, numhh_list) %>% 
   kable(format = "html")
 ```
 
 
 ---
-# ATE under adjustment
+# ATE under adjustment for `numhh`
+
+The model with adjustment:
+$$doc\_any\_12m_i = \alpha + \tau\times selected_i + \beta\times numhh_i+ \varepsilon_i$$
+Estimation:
+```{r}
+fit_adj <- lm(doc_any_12m ~ treatment + numhh_list, data = ohie)
+```
+
+---
+# Results
 
 ```{r}
-lm(doc_any_12m ~ selected + numhh_list, data = ohie) %>% 
+fit_adj %>% 
   tidy(conf.int = TRUE) %>% 
   dplyr::select(term, estimate, starts_with("conf.")) %>% 
   kable(digits = 4, format = "html")
 ```
 
-
-After adjusting for `numhh_list`, ATE has increased from 0.057 to 0.064. Can you guess why?
+After adjusting for `numhh`, ATE has increased from 5.72 to 6.35 percentage points. (Can you guess why?)
 
 
 
@@ -446,27 +442,25 @@ name: pot
 
 
 ---
-# Pearl and DAGs
+# DAGs
 
 ```{r, echo=FALSE, fig.align='center'}
-include_graphics("figs/pearl.png")
+include_graphics("figs/pitt-dags.jpg")
 ```
 
-__Source__: The Book of Why (Pearl and Mackenzie)
+[Source](https://i.imgflip.com/1xhtwh.jpg)
 
 ---
-# DAGs (Pearl)
+# What are DAGs?
 
 .pull-left[
-A DAG is a way to model a system of causal interactions using graphs.
+A DAG (directed acyclic graph) is a way to model a system of causal interactions using graphs.
 
 
 - __Nodes__ represents random variables, e.g., $X$, $Y$, etc.
-
 - __Arrows__ (or directed edges) represent "from $\rightarrow$ to" causal effects. For example, $Z\rightarrow X$ reads " $Z$ causes $X$".
-
 - A __path__ is a sequence of edges connecting two nodes. For example, $Z\rightarrow X \rightarrow M \leftarrow Y$ describes a path from $Z$ to $Y$.
-  - In a __direct path__ arrows point to the same direction: $Z\rightarrow X \rightarrow M$
+- In a __direct path__ arrows point to the same direction: $Z\rightarrow X \rightarrow M$
 ]
 .pull-right[
 ```{r, echo=FALSE}
@@ -483,40 +477,24 @@ dag %>%
 ]
 
 ---
-#DAGs and SEM
-
-- Another way to think about DAGs is as non-parametric __structural equation models__ (SEM)
-
-- For example, the single-confounder DAG, $D\leftarrow X\rightarrow Y$, can be represented by a set of three equations:  
-
-$$\begin{array}{l}
-X\leftarrow f_X\left(U_{X}\right) \\
-D\leftarrow f_D\left(X, U_D\right)\\
-Y\leftarrow f_Y(D,X,U_Y)
-\end{array}$$
-where 
-- The $f_{i}$'s denote the causal mechanisms in the model. Are not restricted to be linear.
-- $U_X,U_D,U_Y$ denote independent background factors that the we chooses not to include in the analysis.
-- Assignment operator $(\leftarrow)$ captures asymmetry of causal relationships.
-
----
-# Confounder
+# Confounder DAG
 
 .pull-left[
 - $X$ is a common cause of $D$ and $Y$.
 
-- conditioning on $X$ removes dependency between $D$ and $Y$
+- conditioning on $X$ removes dependency between $D$ and $Y$ through $X$.
 
 - In DAG terms, controlling for X "closes the backdoor path" between $D$ and $Y$, and leaves open the direct path.
 
-- The notion of closing the backdoor path is similar to dealing with the omitted variable bias.
+- The notion of closing the backdoor path is related to the notion of omitted variable bias.
 
 ]
 .pull-right[
 ```{r, echo=FALSE}
 dag <- dagify(
   D ~ X,
-  Y ~ X
+  Y ~ X,
+  Y ~ D
 ) 
 dag %>% 
   ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
@@ -524,6 +502,24 @@ dag %>%
 
 ```
 ]
+
+---
+#DAGs and SEM
+
+- Another way to think about DAGs is as non-parametric __structural equation models__ (SEM)
+
+- For example, the single-confounder DAG we've just seen can be represented by a set of three equations:  
+
+$$\begin{array}{l}
+X\leftarrow f_X\left(u_{X}\right) \\
+D\leftarrow f_D\left(X, u_D\right)\\
+Y\leftarrow f_Y(D,X,u_Y)
+\end{array}$$
+where 
+- The $f_{i}$'s denote the causal mechanisms in the model. Are not restricted to be linear.
+- $u_X,u_D$,and $u_Y$ denote independent background factors that the we chooses not to include in the analysis.
+- Assignment operator $(\leftarrow)$ captures asymmetry of causal relationships.
+
 
 ---
 # Unconfoundedness in DAGs
@@ -561,8 +557,11 @@ include_graphics("figs/iv2.png")
 ```
 ]
 
+
+
+
 ---
-# Mediator
+# A mediator
 
 .pull-left[
 - $D$ causes $M$ causes $Y$.
@@ -589,7 +588,7 @@ dag %>%
 
 
 ---
-# Collider
+# A Collider
 
 .pull-left[
 
@@ -623,7 +622,7 @@ dag %>%
 
 __EXAMPLE:__ Occupation as control in a return to years of schooling regression.
 
-Discovering that a person works as a developer in a high-tech firm changes things; knowing that the person does not have a college degree tells us immediately that he is likely to be highly capable.
+Discovering that a person works as a developer in a high-tech firm changes things; knowing that the person does not have a college degree tells us immediately that he is likely to be very talented.
 ]
 .pull-right[
 ```{r, echo=FALSE}
@@ -645,11 +644,20 @@ m_bias(x = "Education", y = "Diabetes", a = "Income during\nChildhood",
 ```
 
 
+---
+class: title-slide-section-blue, center, middle
+name: sim
+
+# Simulations
+
+
 
 ---
 # Simulation I: De-counfounding
 
 .pull-left[
+
+Simulate the DGP:
 ```{r}
 n <- 1000
 p <- 3
@@ -660,18 +668,38 @@ x <- u[,2]
 d <- 0.8 * x + 0.6 * u[,1]
 y <- 0 * d + 0.2 * x + u[,3]
 ```
+Note that the "true" effect $D\rightarrow Y$ is zero (i.e., $ATE=0$).
+]
+.pull-right[
+```{r, echo=FALSE}
+dag <- dagify(
+  Y ~ X,
+  D ~ X
+) 
+dag %>% 
+  ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
 
-```{r}
+```
+]
+
+---
+# Simulation I: De-counfounding (cont.)
+
+.pull-left[
+Raw correlation matrix:
+```{r, echo=FALSE}
 cor(cbind(y,x,d)) %>% 
   kable(digits = 1, format = "html")
 ```
+
+__Note:__ $Y$ and $D$ are correlated even though there is no direct arrow between them. This is due to the confounder $X$ which opens a backdoor path between $Y$ and $D$.
 ]
 .pull-right[
 ```{r, echo=FALSE}
 dag <- dagify(
   Y ~ X,
-  D ~ X,
-  Y ~ D
+  D ~ X
 ) 
 dag %>% 
   ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
@@ -681,32 +709,34 @@ dag %>%
 ]
 
 ---
-# Simulation I: De-counfounding
+# Simulation I: De-counfounding (cont.)
 
 .pull-left[
 
-`y ~ d + x`
+Let's estimate the model with $X$ on the right hand side:
+
 ```{r, echo=FALSE}
-lm(y ~ d + x) %>% 
+lm(y ~ d + x - 1) %>% 
   tidy() %>% 
   dplyr::select(term, estimate, p.value) %>% 
   kable(digits = 2, format = "html")
 ```
 
-`y ~ d`
+and without $X$
 ```{r, echo=FALSE}
-lm(y ~ d) %>% 
+lm(y ~ d - 1) %>% 
   tidy() %>% 
   dplyr::select(term, estimate, p.value) %>% 
   kable(digits = 2, format = "html")
 ```
+  
+__BOTTOM LINE:__ Controlling for $X$ provides the correct answer.
 ]
 .pull-right[
 ```{r, echo=FALSE}
 dag <- dagify(
   Y ~ X,
-  D ~ X,
-  Y ~ D
+  D ~ X
 ) 
 dag %>% 
   ggdag(layout = "tree", text_size = 12, node = FALSE, text_col = "black") +
@@ -715,9 +745,130 @@ dag %>%
 ]
 
 ---
-# Simulation II: M-bias
+# Simulation II: Mediator
 
 .pull-left[
+The DGP:
+```{r}
+n <- 1000
+p <- 3
+
+u <- matrix(rnorm(n * p), n, p)
+
+d <- u[,1]
+m <- 1.3 * d + u[,2]
+y <- 0.1 * m + u[,3]
+```
+
+True effect of $D\rightarrow Y$ is $1.3\times 0.1 = 0.13$.
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 1, 0,
+  "M", 0.5, 0
+)
+dag <- dagify(
+ M ~ D,
+ Y ~ M,
+ exposure = "D",
+ outcome = "Y",
+ coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+---
+# Simulation II: Mediator (cont.)
+
+.pull-left[
+Raw correlation matrix:
+```{r, echo=FALSE}
+cor(cbind(y,m,d)) %>% 
+  kable(digits = 1, format = "html")
+```
+  
+In this case, both the mediator $M$ and the treatment $D$ are correlated with the outcome $Y$. 
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 1, 0,
+  "M", 0.5, 0
+)
+dag <- dagify(
+ M ~ D,
+ Y ~ M,
+ exposure = "D",
+ outcome = "Y",
+ coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+
+```
+]
+
+
+---
+# Simulation II: Mediator (cont.)
+
+.pull-left[
+Estimate the model with $M$:  
+
+```{r, echo=FALSE}
+lm(y ~ d + m - 1) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>% 
+  kable(digits = 2, format = "html")
+```
+  
+and without $M$:  
+```{r, echo=FALSE}
+lm(y ~ d - 1) %>% 
+  tidy() %>% 
+  dplyr::select(term, estimate, p.value) %>% 
+  kable(digits = 2, format = "html")
+```
+
+__BOTTOM LINE:__ Controlling for $M$ in this case biases the total effect of $D$ on $Y$ downward since it blocks the path from $D$ to $Y$.
+
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 1, 0,
+  "M", 0.5, 0
+)
+dag <- dagify(
+ M ~ D,
+ Y ~ M,
+ exposure = "D",
+ outcome = "Y",
+ coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+```
+]
+
+---
+# Simulation III: M-bias
+
+.pull-left[
+Generate the data:
 ```{r}
 n <- 1000
 p <- 3
@@ -729,10 +880,7 @@ x <- 0.8 * u[,1] + 0.2 * u[,2] + 0.6 * u[,3]
 y <- 0 * d + u[,2]
 ```
 
-```{r}
-cor(cbind(y,x,d)) %>% 
-  kable(digits = 1, format = "html")
-```
+Note that $X$ is a collider, and that the "true" effect $D\rightarrow Y$ is zero (i.e., $ATE=0$).
 ]
 .pull-right[
 ```{r, echo=FALSE}
@@ -756,29 +904,69 @@ dag <- dagify(
 dag %>% 
   ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
   theme_dag()
-
 ```
 ]
 
 ---
-# Simulation II: M-bias
+# Simulation III: M-bias (cont.)
 
 .pull-left[
-`y ~ d + x`
+Raw correlation matrix:
 ```{r, echo=FALSE}
-lm(y ~ d + x) %>% 
+cor(cbind(y,x,d)) %>% 
+  kable(digits = 1, format = "html")
+```
+
+Notice how $Y$ is uncorrelated with $D$ and $X$ is correlated with both $D$ and $Y$.
+]
+.pull-right[
+```{r, echo=FALSE}
+coords <- tribble(
+  ~name, ~x, ~y,
+  "D", 0, 0,
+  "Y", 2, 0,
+  "Ud", 0, 1,
+  "Uy", 2, 1,
+  "X",  1, 0.5
+)
+
+dag <- dagify(
+  X ~ Uy + Ud,
+  D ~ Ud,
+  Y ~ Uy, 
+  exposure = "X",
+  outcome = "Y",
+  coords = coords
+) 
+dag %>% 
+  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
+  theme_dag()
+```
+]
+
+
+---
+# Simulation III: M-bias
+
+.pull-left[
+Estimate the model with $X$  
+```{r, echo=FALSE}
+lm(y ~ d + x - 1) %>% 
   tidy() %>% 
   dplyr::select(term, estimate, p.value) %>%
   kable(digits = 2, format = "html")
 ```
 
-`y ~ d`
+and without $X$
 ```{r, echo=FALSE}
-lm(y ~ d) %>% 
+lm(y ~ d - 1) %>% 
   tidy() %>% 
   dplyr::select(term, estimate, p.value) %>% 
   kable(digits = 2, format = "html")
 ```
+
+__BOTTOM LINE:__ Controlling for $X$ in this case results in finding a spurious effect of $D$ on $Y$ since it opens a backdoor path between $D$ to $Y$.
+
 ]
 .pull-right[
 ```{r, echo=FALSE}
@@ -806,93 +994,7 @@ dag %>%
 ```
 ]
 
----
-# Simulation III: Mediator
 
-.pull-left[
-```{r}
-n <- 1000
-p <- 3
-
-u <- matrix(rnorm(n * p), n, p)
-
-d <- u[,1]
-x <- 1.3 * d + u[,2]
-y <- 0.1 * d + 0.07 * x + u[,3]
-```
-
-```{r}
-cor(cbind(y,x,d)) %>% 
-  kable(digits = 1, format = )
-```
-]
-.pull-right[
-```{r, echo=FALSE}
-coords <- tribble(
-  ~name, ~x, ~y,
-  "D", 0, 0,
-  "Y", 1, 0,
-  "X", 0.5, 0.5
-)
-dag <- dagify(
- X ~ D,
- Y ~ X,
- Y ~ D,
- exposure = "D",
- outcome = "Y",
- coords = coords
-) 
-dag %>% 
-  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
-  theme_dag()
-
-```
-]
-
-
----
-# Simulation III: Mediator
-
-.pull-left[
-`y ~ d + x`
-```{r, echo=FALSE}
-lm(y ~ d + x) %>% 
-  tidy() %>% 
-  dplyr::select(term, estimate, p.value) %>% 
-  kable(digits = 2, format = "html")
-```
-
-`y ~ d`
-
-```{r, echo=FALSE}
-lm(y ~ d) %>% 
-  tidy() %>% 
-  dplyr::select(term, estimate, p.value) %>% 
-  kable(digits = 2, format = "html")
-```
-]
-.pull-right[
-```{r, echo=FALSE}
-coords <- tribble(
-  ~name, ~x, ~y,
-  "D", 0, 0,
-  "Y", 1, 0,
-  "X", 0.5, 0.5
-)
-dag <- dagify(
- X ~ D,
- Y ~ X,
- Y ~ D,
- exposure = "D",
- outcome = "Y",
- coords = coords
-) 
-dag %>% 
-  ggdag(layout = "tree",text_size = 12, node = FALSE, text_col = "black") +
-  theme_dag()
-
-```
-]
 
 
 ---
@@ -902,9 +1004,7 @@ dag %>%
 
 - Need to specify the entire DGP (it REALY a limitation?)
 
-- Simultaneity
-
-_"In fact it is not immediately obvious to me how one would capture supply and demand models in a DAG"_ - Imbens (forthcoming)
+- Simultaneity: _"In fact it is not immediately obvious to me how one would capture supply and demand models in a DAG"_ (Imbens, forthcoming)
 
 ```{r, echo=FALSE, fig.align='center', out.width='55%'}
 include_graphics("figs/sim.png")
@@ -912,7 +1012,7 @@ include_graphics("figs/sim.png")
 
 
 ---
-# Recommended introductory level resources on DAGS
+# Recommended introductory level resources on DAGs
 
 - [The Book of Why](http://bayes.cs.ucla.edu/WHY/) by Pearl and Mackenzie.
 
