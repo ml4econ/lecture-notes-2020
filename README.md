@@ -50,13 +50,13 @@ The schedule below is tentative and subject to change, depending on time and cla
 | [**3**](#week-3)      | Regression and Regularization              |
 | [**4**](#week-4)      | Classification                             |
 | [**5**](#week-5)      | Trees and Forests                          |
-| [**6**](#week-6)      | Unsupervised Learning                      | 
-| [**7**](#week-7)      | Text analysis                              |
-| [**8**](#week-7)      | Causal Inference                           |
-| [**9**](#week-8)      | Lasso and Average Treatment Effects        |
-| [**10**](#week-9)     | Trees and Heterogeneous Treatment Effects  |
-| [**11**](#week-10)    | Prediction Policy Problems                 |
-| [**12**](#week-11)    | The Economics of AI                        |
+| [**6**](#week-6)      | Causal inference                           | 
+| [**7**](#week-7)      | Lasso and Treatment Effects                |
+| [**8**](#week-7)      | Trees, Forests and Treatment Effects       |
+| [**9**](#week-8)      | Prediction Policy Problems                 |
+| [**10**](#week-9)     | Unsupervised Learning                      |
+| [**11**](#week-10)    | Text Analysis                              |
+| [**12**](#week-11)    | TBA                                        |
 
 
 ## Slides
