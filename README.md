@@ -51,7 +51,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 | [**4**](#week-4)      | Classification                             |
 | [**5**](#week-5)      | Trees and Forests                          |
 | [**6**](#week-6)      | Causal inference                           | 
-| [**7**](#week-7)      | High-Dimensional Counfounding Adjustmen    |
+| [**7**](#week-7)      | High-Dimensional Counfounding Adjustment   |
 | [**8**](#week-7)      | Trees, Forests and Treatment Effects       |
 | [**9**](#week-8)      | Prediction Policy Problems                 |
 | [**10**](#week-9)     | Unsupervised Learning                      |
