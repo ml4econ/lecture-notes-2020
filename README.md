@@ -43,20 +43,20 @@ Course participants are expected to:
 
 The schedule below is tentative and subject to change, depending on time and class interests. We will move at a pace dictated by class discussions.  Please check this page often for updates.
 
-| Week                  | Topic                                      |
-|:----------------------|:-------------------------------------------|
-| [**1**](#week-1)      | Course Overview & Reproducibility          |
-| [**2**](#week-2)      | Basic ML Concepts                          |
-| [**3**](#week-3)      | Regression and Regularization              |
-| [**4**](#week-4)      | Classification                             |
-| [**5**](#week-5)      | Trees and Forests                          |
-| [**6**](#week-6)      | Causal inference                           | 
-| [**7**](#week-7)      | High-Dimensional Counfounding Adjustment   |
-| [**8**](#week-7)      | Trees, Forests and Treatment Effects       |
-| [**9**](#week-8)      | Prediction Policy Problems                 |
-| [**10**](#week-9)     | Unsupervised Learning                      |
-| [**11**](#week-10)    | Text Analysis                              |
-| [**12**](#week-11)    | TBA                                        |
+| Week                  | Topic                                               |
+|:----------------------|:----------------------------------------------------|
+| [**1**](#week-1)      | Course Overview & Reproducibility                   |
+| [**2**](#week-2)      | Basic ML Concepts                                   |
+| [**3**](#week-3)      | Regression and Regularization                       |
+| [**4**](#week-4)      | Classification                                      |
+| [**5**](#week-5)      | Trees and Forests                                   |
+| [**6**](#week-6)      | Causal inference                                    | 
+| [**7**](#week-7)      | High-Dimensional Counfounding Adjustment            |
+| [**8**](#week-7)      | High-Dimensional Heterogeneous Treatment Effects    |
+| [**9**](#week-8)      | Prediction Policy Problems                          |
+| [**10**](#week-9)     | Unsupervised Learning                               |
+| [**11**](#week-10)    | Text Analysis                                       |
+| [**12**](#week-11)    | TBA                                                 |
 
 
 ## Slides
@@ -87,6 +87,8 @@ The schedule below is tentative and subject to change, depending on time and cla
 8. [Causal Inference](https://raw.githack.com/ml4econ/lecture-notes-2020/master/08-causal-inference/08-causal-inference.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/08-causal-inference/08-causal-inference.pdf)
 
 9. [High-Dimensional Confounding Adjustment](https://raw.githack.com/ml4econ/lecture-notes-2020/master/09-lasso-ate/09-lasso-ate.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/09-lasso-ate/09-lasso-ate.pdf)
+
+10. [High-Dimensional Heterogeneous Treatment Effects]()
 
 ### Part III: Unsupervised Learning
 
