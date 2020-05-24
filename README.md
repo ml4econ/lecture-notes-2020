@@ -51,7 +51,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 | [**4**](#week-4)      | Classification                             |
 | [**5**](#week-5)      | Trees and Forests                          |
 | [**6**](#week-6)      | Causal inference                           | 
-| [**7**](#week-7)      | Lasso and Treatment Effects                |
+| [**7**](#week-7)      | High-Dimensional Counfounding Adjustmen    |
 | [**8**](#week-7)      | Trees, Forests and Treatment Effects       |
 | [**9**](#week-8)      | Prediction Policy Problems                 |
 | [**10**](#week-9)     | Unsupervised Learning                      |
@@ -84,7 +84,9 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 ### Part II: Causal Inference and ML
 
-8. [Causal Inference](https://raw.githack.com/ml4econ/lecture-notes-2020/master/08-causal-inference/08-causal-inference.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/08-causal-inference/08-causal-inference.pdf) 
+8. [Causal Inference](https://raw.githack.com/ml4econ/lecture-notes-2020/master/08-causal-inference/08-causal-inference.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/08-causal-inference/08-causal-inference.pdf)
+
+9. [High-Dimensional Confounding Adjustment](https://raw.githack.com/ml4econ/lecture-notes-2020/master/09-lasso-ate/09-lasso-ate.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/09-lasso-ate/09-lasso-ate.pdf)
 
 ### Part III: Unsupervised Learning
 

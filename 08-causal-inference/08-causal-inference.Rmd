@@ -2,7 +2,7 @@
 title: "08 - Causal Inference"
 subtitle: "ml4econ, HUJI 2020"
 author: "Itamar Caspi"
-date: "May 18, 2019 (updated: `r Sys.Date()`)"
+date: "May 18, 2020 (updated: `r Sys.Date()`)"
 output:
   xaringan::moon_reader:
     css: [default, "style/middlebury.css", "style/middlebury-fonts.css"]
