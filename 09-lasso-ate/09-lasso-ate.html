@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 # 09 - High-Dimensional Confounding Adjustment
 ## ml4econ, HUJI 2020
 ### Itamar Caspi
-### May 24, 2020 (updated: 2020-05-24)
+### May 24, 2020 (updated: 2020-05-25)
 
 ---
 
@@ -38,11 +38,8 @@ pacman::p_load(
   ggdag,
   knitr,
   xaringan,
-  RefManageR
 )
 ```
-
-
 
 
 
@@ -56,8 +53,6 @@ pacman::p_load(
 - [Lasso and Variable Selection](#sel)
 
 - [High Dimensional Confoundedness](#ate)
-
-- [Double Machine Learning](#dml)
 
 - [Empirical Illustration using `hdm`](#hdm)
 
@@ -255,7 +250,7 @@ Source: [Mullainathan and Spiess (JEP 2017)](https://www.aeaweb.org/articles/pdf
 class: title-slide-section-blue, center, middle
 name: ate
 
-# Lasso in Aid of Causal Inference
+# High Dimensional Confoundedness
 
 
 

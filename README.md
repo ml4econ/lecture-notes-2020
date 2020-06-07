@@ -88,7 +88,8 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 9. [High-Dimensional Confounding Adjustment](https://raw.githack.com/ml4econ/lecture-notes-2020/master/09-lasso-ate/09-lasso-ate.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/09-lasso-ate/09-lasso-ate.pdf)
 
-10. [High-Dimensional Heterogeneous Treatment Effects]()
+10. [High-Dimensional Heterogeneous Treatment Effects](https://raw.githack.com/ml4econ/lecture-notes-2020/master/10-trees-cate/10-trees-cate.html)[(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/10-trees-cate/09-trees-cate.pdf)
+
 
 ### Part III: Unsupervised Learning
 
