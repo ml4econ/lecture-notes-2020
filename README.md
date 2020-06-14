@@ -90,6 +90,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 10. [High-Dimensional Heterogeneous Treatment Effects](https://raw.githack.com/ml4econ/lecture-notes-2020/master/10-trees-cate/10-trees-cate.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/10-trees-cate/10-trees-cate.pdf)
 
+11. [Prediction Policy Problems](https://raw.githack.com/ml4econ/lecture-notes-2020/master/11-pred-policy/11-pred-policy.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/11-pred-policy/11-pred-policy.pdf)
 
 ### Part III: Unsupervised Learning
 
