@@ -611,7 +611,7 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %>% end()`
 
-[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/08-lasso-ate)  
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2020/tree/master/09-lasso-ate)  
 
 
 
