@@ -34,6 +34,7 @@ pacman::p_load(
   tidyverse,
   tidymodels,
   causalTree,
+  experimentdatar,
   rpart.plot,
   broom,
   knitr,
@@ -621,27 +622,19 @@ __NOTE:__ The `social` dataset includes a much richer feature set. It includes a
 ---
 # Data wrangling
 
-Load data and modelling packages
+
+Rename the outcome and treatment variables
 ```{r}
-library(tidyverse)
-library(tidymodels)
-```
-
-
-Set seed for replication and rename the outcome and treatment variables
-```{r}
-
 df <- social %>% 
   select(Y, D, X) %>% 
   rename(Y = outcome_voted, D = treat_neighbors)
-  
 ```
 
-We will only use part of the sample to make things run faster
+We will only use a subset of the sample to make things run faster
 ```{r}
 set.seed(1203)
 
-df <- df %>% 
+df_smpl <- df %>%
   sample_n(50000)
 ```
 
@@ -653,10 +646,10 @@ Before we start, we need to split our sample to a training and estimation sets, 
 
 
 ```{r}
-split    <- initial_split(df, prop = 0.5)
+split    <- initial_split(df_smpl, prop = 0.5)
 
-df_trainain <- training(split) 
-df_estim    <- testing(split)
+df_train <- training(split) 
+df_estim <- testing(split)
 ```
 
 ---
@@ -680,32 +673,43 @@ We now proceed to estimating the tree using the __CT-H__ approach:
 
 ```{r}
 tree <- honest.causalTree(
-  "I(Y) ~ . - D",
-  data=df_train,
-  treatment=df_train$D,
-  est_data=df_estim,
-  est_treatment=df_estim$D,
-  split.Rule="CT",
-  split.Honest=TRUE,
-  split.Bucket=TRUE,
-  bucketNum=5,
-  bucketMax=100,
-  cv.option="CT",  
-  cv.Honest=TRUE,
-  minsize=200,
-  split.alpha=0.5,
-  cv.alpha=0.5,
-  HonestSampleSize=nrow(df_estim),
-  cp=0)
+  formula = "I(Y) ~ . - D",
+  
+  data      = df_train,
+  treatment = df_train$D,
+  
+  est_data      = df_estim,
+  est_treatment = df_estim$D,
+  
+  split.Rule   = "CT",
+  split.Honest = TRUE,
+  
+  cv.option = "CT",  
+  cv.Honest = TRUE,
+  
+  minsize = 200,
+  HonestSampleSize = nrow(df_estim),
+  cp=0
+)
 ```
 
 ---
 # Prune the tree based on (honest) cross-validation
 
+Extract table of cross-validated values by tuning parameter
 ```{r}
-opcp        <- tree$cptable[, 1][which.min(tree$cptable[, 4])]
-pruned_tree <- prune(tree, cp = opcp)
+cptable <- as.data.frame(tree$cptable)
+```
 
+Obtain optimal $cp$ to prune tree
+```{r}
+min_cp      <- which.min(cptable$xerror)
+optim_cp_ct <- cptable[min_cp, "CP"]
+```
+
+Prune the tree at optimal $cp$
+```{r}
+pruned_tree <- prune(tree = tree, cp = optim_cp_ct)
 ```
 
 
@@ -713,14 +717,24 @@ pruned_tree <- prune(tree, cp = opcp)
 # The estimated tree
 
 ```{r, echo=FALSE, out.width = "50%", fig.align='center'}
-rpart.plot(tree, type = 3, clip.right.labs = TRUE, branch = .3)
+rpart.plot(
+  tree,
+  type = 3,
+  clip.right.labs = TRUE,
+  branch = .3
+)
 ```
 
 ---
 # Pruned tree
 
 ```{r, echo=FALSE, out.width = "60%", fig.align='center'}
-rpart.plot(pruned_tree, type = 3, clip.right.labs = TRUE, branch = .3)
+rpart.plot(
+  pruned_tree,
+  type = 3,
+  clip.right.labs = TRUE,
+  branch = .3
+)
 ```
 
 
@@ -776,13 +790,19 @@ df_all_lm  <-
 
 ```{r coefs, echo=FALSE, out.width = "50%", fig.align='center'}
 df_all_lm %>% 
-  filter(grepl(":D",term)) %>%  # keep only interaction terms
-  ggplot(aes(x = term, y = estimate, 
+  filter(str_detect(term, pattern = ":D")) %>%  # keep only interaction terms
+  ggplot(aes(x = term,
+             y = estimate, 
              ymin = conf.low,
-             ymax = conf.high)) +
-  geom_hline(yintercept = 0, color = "gray50") +
+             ymax = conf.high
+            )
+  ) +
+  geom_hline(yintercept = 0, color = "red") +
   geom_pointrange(position = position_dodge(width = 1), size = 0.8) +
-  labs(x = "", y = "CATE and confidence interval") +
+  labs(
+    x = "",
+    y = "CATE and confidence interval"
+  ) +
   facet_grid(. ~ sample) +
   coord_flip()
 ```
@@ -793,9 +813,7 @@ df_all_lm %>%
 # On the interpretation of causal trees
 
 ```{r, echo=FALSE, out.width = "60%", fig.align='center'}
-
 include_graphics("figs/cate_xs.png")
-
 ```
 
 Source: [https://drive.google.com/open?id=1FuF4_q4HCzbU_ImFoLW4r4Gop6A0YsO_](https://drive.google.com/open?id=1FuF4_q4HCzbU_ImFoLW4r4Gop6A0YsO_)
