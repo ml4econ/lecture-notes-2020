@@ -567,7 +567,7 @@ class: .title-slide-final, center, inverse, middle
 
 # `slides %>% end()`
 
-[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/notes-spring2019/tree/master/10-pred-pollicy)  
+[<i class="fa fa-github"></i> Source code](https://github.com/ml4econ/lecture-notes-2020/tree/master/11-pred-policy)  
 
 
 
