@@ -94,9 +94,7 @@ The schedule below is tentative and subject to change, depending on time and cla
 
 ### Part III: Unsupervised Learning
 
-12. [Unsupervised Learning]()
-
-13. [Text Analysis]()
+12. [Text Analysis](https://raw.githack.com/ml4econ/lecture-notes-2020/master/11-pred-policy/12-text-mining.html) [(PDF)](https://github.com/ml4econ/lecture-notes-2020/blob/master/12-text-mining/12-text-mining.pdf)
 
 ### Projects
 
